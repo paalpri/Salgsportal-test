@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: local
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U root -d local']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  pgdata:
