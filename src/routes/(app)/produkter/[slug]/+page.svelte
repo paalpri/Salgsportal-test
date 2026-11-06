@@ -1,21 +1,15 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { withToast } from '#lib/forms.ts';
 	import { formatPrice } from '#lib/format.ts';
+	import OrderLink from '#lib/components/app/order-link.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
-	import { Input } from '#lib/components/ui/input/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import Package from '@lucide/svelte/icons/package';
-	import Plus from '@lucide/svelte/icons/plus';
 	import Pencil from '@lucide/svelte/icons/pencil';
-	import ShoppingCart from '@lucide/svelte/icons/shopping-cart';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const p = $derived(data.product);
-	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
 </script>
 
 <svelte:head><title>{p.name} · Modulus Barn</title></svelte:head>
@@ -32,15 +26,9 @@
 
 	<div class="grid gap-8 lg:grid-cols-[1fr_340px]">
 		<div class="space-y-6">
-			<div class="aspect-[16/9] overflow-hidden rounded-lg bg-card">
-				{#if p.imageUrl}
-					<img src={p.imageUrl} alt="" class="size-full object-cover" />
-				{:else}
-					<div class="flex size-full items-center justify-center">
-						<Package class="size-16 text-muted-foreground/50" strokeWidth={1} />
-					</div>
-				{/if}
-			</div>
+			{#if p.imageUrl}
+				<img src={p.imageUrl} alt="" class="aspect-[16/9] w-full rounded-lg object-cover" />
+			{/if}
 			<div class="space-y-3">
 				<div class="flex flex-wrap items-center gap-2">
 					{#if data.category}
@@ -64,39 +52,10 @@
 					<Card.Title class="text-2xl">{formatPrice(p.priceNok, p.priceUnit)}</Card.Title>
 				</Card.Header>
 				<Card.Content class="space-y-3">
-					{#if canOrder}
-						<form
-							method="post"
-							action="/produkter?/addToCart"
-							class="flex gap-2"
-							use:enhance={withToast('Lagt til i handlelisten', { reset: false })}
-						>
-							<input type="hidden" name="productId" value={p.id} />
-							<Input
-								type="number"
-								name="quantity"
-								value="1"
-								min="1"
-								max="999"
-								class="w-20"
-								aria-label="Antall"
-							/>
-							<Button type="submit" class="flex-1"><Plus /> Legg i handlelisten</Button>
-						</form>
-						{#if data.inCartQuantity}
-							<Button href="/handleliste" variant="secondary" class="w-full">
-								<ShoppingCart />
-								{data.inCartQuantity} i handlelisten
-							</Button>
-						{/if}
-					{:else if !data.user.municipalityId}
-						<p class="text-sm text-muted-foreground">
-							Brukeren din er ikke knyttet til en kommune, så du kan ikke bestille.
-						</p>
-					{/if}
+					<OrderLink url={p.orderUrl} size="lg" class="h-11 w-full" />
 					<p class="text-xs text-muted-foreground">
-						Handlelisten deles med kollegaer i kommunen. Send den som forespørsel når dere er klare,
-						så tar vi kontakt.
+						Bestilling skjer utenfor portalen. Har dere spørsmål om modulen, spør gjerne andre
+						kommuner i forumet.
 					</p>
 				</Card.Content>
 			</Card.Root>

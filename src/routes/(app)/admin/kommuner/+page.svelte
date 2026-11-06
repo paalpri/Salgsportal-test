@@ -24,5 +24,5 @@
 	]}
 	note={(row) => `${row.users} brukere`}
 	deleteDescription={(row) =>
-		`${row.users} brukere mister koblingen til kommunen, og handlelisten slettes. Kommuner med forespørsler kan ikke slettes.`}
+		`${row.users} brukere mister koblingen til kommunen. Ønskene deres beholdes.`}
 />

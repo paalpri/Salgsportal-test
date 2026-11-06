@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { modules, type ModuleKey } from '#lib/modules.ts';
+	import { modules } from '#lib/modules.ts';
 	import { initials } from '#lib/format.ts';
 	import Logo from './logo.svelte';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
@@ -12,10 +12,9 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Package from '@lucide/svelte/icons/package';
 	import MessagesSquare from '@lucide/svelte/icons/messages-square';
-	import Inbox from '@lucide/svelte/icons/inbox';
+	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import Users from '@lucide/svelte/icons/users';
 	import Landmark from '@lucide/svelte/icons/landmark';
-	import Blocks from '@lucide/svelte/icons/blocks';
 	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import Moon from '@lucide/svelte/icons/moon';
@@ -24,10 +23,8 @@
 
 	type Props = {
 		user: { name: string; email: string; isAdmin: boolean; municipalityName: string | null };
-		enabled: ModuleKey[];
-		cartCount: number;
 	};
-	let { user, enabled, cartCount }: Props = $props();
+	let { user }: Props = $props();
 
 	const adminLinks = [
 		{ href: '/admin', label: 'Oversikt', icon: LayoutDashboard },
@@ -35,13 +32,11 @@
 		{ href: '/admin/innlegg', label: 'Nyheter og kampanjer', icon: FileText },
 		{ href: '/admin/produkter', label: 'Moduler og priser', icon: Package },
 		{ href: '/admin/forum', label: 'Forumkategorier', icon: MessagesSquare },
-		{ href: '/admin/foresporsler', label: 'Forespørsler', icon: Inbox },
+		{ href: '/admin/onsker', label: 'Ønsker fra kommunene', icon: Lightbulb },
 		{ href: '/admin/brukere', label: 'Brukere', icon: Users },
-		{ href: '/admin/kommuner', label: 'Kommuner', icon: Landmark },
-		{ href: '/admin/seksjoner', label: 'Seksjoner', icon: Blocks }
+		{ href: '/admin/kommuner', label: 'Kommuner', icon: Landmark }
 	];
 
-	const visibleModules = $derived(modules.filter((m) => enabled.includes(m.key)));
 	const isActive = (href: string) =>
 		href === '/' || href === '/admin'
 			? page.url.pathname === href
@@ -79,14 +74,8 @@
 			</Sidebar.GroupLabel>
 			<Sidebar.Menu>
 				<Sidebar.MenuItem>{@render link('/', 'Hjem', House)}</Sidebar.MenuItem>
-				{#each visibleModules as m (m.key)}
-					<Sidebar.MenuItem>
-						{@render link(m.href, m.label, m.icon)}
-						{#if m.key === 'cart' && cartCount > 0}
-							<Sidebar.MenuBadge class="rounded-sm bg-coral text-ink">{cartCount}</Sidebar.MenuBadge
-							>
-						{/if}
-					</Sidebar.MenuItem>
+				{#each modules as m (m.href)}
+					<Sidebar.MenuItem>{@render link(m.href, m.label, m.icon)}</Sidebar.MenuItem>
 				{/each}
 			</Sidebar.Menu>
 		</Sidebar.Group>

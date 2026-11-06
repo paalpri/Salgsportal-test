@@ -22,6 +22,20 @@
       "when": 1793953762319,
       "tag": "0002_post_kinds",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793955326867,
+      "tag": "0003_remove_shopping_list",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793955337881,
+      "tag": "0004_wishlist",
+      "breakpoints": true
     }
   ]
 }

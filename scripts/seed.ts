@@ -160,12 +160,6 @@ async function main() {
 				slug: 'opplaering-og-superbrukere',
 				description: 'Kurs, opplæringsopplegg og superbrukernettverk.',
 				sortOrder: 6
-			},
-			{
-				name: 'Ønsker til videreutvikling',
-				slug: 'onsker-til-videreutvikling',
-				description: 'Foreslå forbedringer. Kommunene prioriterer videreutviklingen i fellesskap.',
-				sortOrder: 7
 			}
 		])
 		.returning();
@@ -251,20 +245,6 @@ async function main() {
 					body: 'Fristoversikten per enhet og antall åpne undersøkelser. Vi tar dem ut hver måned.'
 				}
 			]
-		},
-		{
-			category: 'onsker-til-videreutvikling',
-			author: 'sara',
-			title: 'Ønske: samlet oversikt over samværsavtaler',
-			body: 'Det hadde vært fint med en samlet oversikt over alle aktive samværsavtaler per enhet, med filter på dato. Er det flere som savner dette?',
-			age: 13,
-			replies: [
-				{ author: 'ola', body: 'Ja, det savner vi også i Tromsø.' },
-				{
-					author: 'admin',
-					body: 'Takk for innspillet! Vi tar det med til neste prioriteringsmøte med kommunene.'
-				}
-			]
 		}
 	];
 
@@ -347,6 +327,7 @@ async function main() {
 				categoryId: pc.moduler,
 				name: 'Digitale innbyggertjenester',
 				slug: 'digitale-innbyggertjenester',
+				orderUrl: 'https://netcompany.com/digibarnevern-modulus-barn/',
 				summary: 'Sikker digital dialog med barn, unge og familier.',
 				description:
 					'Gi barn, unge og familier innsyn i egen sak og mulighet til å sende og motta dokumenter digitalt. Modulen rulles ut gradvis i samarbeid med kommunene.',
@@ -358,6 +339,7 @@ async function main() {
 				categoryId: pc.moduler,
 				name: 'Mobil arbeidsflate',
 				slug: 'mobil-arbeidsflate',
+				orderUrl: 'https://netcompany.com/digibarnevern-modulus-barn/',
 				summary: 'Dokumenter hjemmebesøk og samtaler fra nettbrett og mobil.',
 				description:
 					'Skriv notater, ta signaturer og se saksinformasjon på farten. Data lagres kryptert og synkroniseres når du er på nett igjen.',
@@ -369,6 +351,7 @@ async function main() {
 				categoryId: pc.moduler,
 				name: 'Utvidet styringsdata',
 				slug: 'utvidet-styringsdata',
+				orderUrl: 'https://netcompany.com/digibarnevern-modulus-barn/',
 				summary: 'Dashbord og nøkkeltall for ledere i barneverntjenesten.',
 				description:
 					'Følg frister, saksmengde og tiltak per enhet, og hent ut rapporter til ledermøter og rapportering med noen få klikk.',
@@ -410,6 +393,7 @@ async function main() {
 				categoryId: pc['innforing-og-migrering'],
 				name: 'Innføringspakke for nye kommuner',
 				slug: 'innforingspakke',
+				orderUrl: 'https://netcompany.com/digibarnevern-modulus-barn/',
 				summary: 'Prosjektledelse, oppsett og opplæring fra start til drift.',
 				description:
 					'Vi følger dere gjennom hele innføringen: planlegging, konfigurasjon, opplæring av superbrukere og oppfølging de første månedene i drift.',
@@ -468,7 +452,6 @@ async function main() {
 			}
 		])
 		.returning();
-	const p = Object.fromEntries(products.map((prod) => [prod.slug, prod]));
 
 	await db.insert(s.post).values([
 		{
@@ -477,7 +460,7 @@ async function main() {
 			slug: 'ny-modul-digitale-innbyggertjenester',
 			excerpt:
 				'Gi barn og familier innsyn og digital dialog. Nå tilgjengelig for alle kommuner som bruker Modulus Barn.',
-			body: 'Med digitale innbyggertjenester kan barn, unge og familier se status i egen sak og sende og motta dokumenter digitalt.\n\nModulen rulles ut gradvis. Legg den i handlelisten, så tar vi kontakt om oppstart.',
+			body: 'Med digitale innbyggertjenester kan barn, unge og familier se status i egen sak og sende og motta dokumenter digitalt.\n\nModulen rulles ut gradvis. Bruk bestillingslenken på modulsiden, så tar vi kontakt om oppstart.',
 			ctaLabel: 'Se modulen',
 			ctaUrl: '/produkter/digitale-innbyggertjenester',
 			published: true,
@@ -490,7 +473,7 @@ async function main() {
 			title: 'Kursdager våren 2027',
 			slug: 'kursdager-varen-2027',
 			excerpt: 'Grunnkurs, superbrukerkurs og BFK i praksis i Oslo, Bergen, Trondheim og Tromsø.',
-			body: 'Meld på saksbehandlere og superbrukere. Legg kurset i handlelisten med antall deltakere, så sender vi datoer.',
+			body: 'Meld på saksbehandlere og superbrukere. Ta kontakt for datoer og påmelding.',
 			ctaLabel: 'Se kursene',
 			ctaUrl: '/produkter?kategori=kurs-og-opplaering',
 			published: true,
@@ -545,10 +528,10 @@ async function main() {
 			title: 'Prioriteringsmøte for videreutvikling 2027',
 			slug: 'prioriteringsmote-2027',
 			excerpt:
-				'Kommunene bestemmer i fellesskap hva som skal utvikles videre. Legg inn ønskene deres i forumet før 1. desember.',
-			body: 'I desember møtes kommunene for å prioritere videreutviklingen av Modulus Barn for 2027.\n\nLegg inn ønsker og forslag i forumet under «Ønsker til videreutvikling» før 1. desember. Støtt gjerne forslag fra andre kommuner med et svar.',
-			ctaLabel: 'Gå til ønskene',
-			ctaUrl: '/forum?kategori=onsker-til-videreutvikling',
+				'Kommunene bestemmer i fellesskap hva som skal utvikles videre. Legg inn ønskene deres på ønskelisten før 1. desember.',
+			body: 'I desember møtes kommunene for å prioritere videreutviklingen av Modulus Barn for 2027.\n\nLegg inn ønskene deres på ønskelisten før 1. desember. Netcompany samler ønskene og tar dem med inn i møtet.',
+			ctaLabel: 'Til ønskelisten',
+			ctaUrl: '/onsker',
 			published: true,
 			authorId: u.admin,
 			publishedAt: daysAgo(12)
@@ -564,83 +547,129 @@ async function main() {
 		}
 	]);
 
-	await db.insert(s.cartItem).values([
-		{
-			municipalityId: k.Bergen,
-			productId: p['mobil-arbeidsflate'].id,
-			quantity: 1,
-			addedById: u.kari
-		},
-		{
-			municipalityId: k.Bergen,
-			productId: p.grunnkurs.id,
-			quantity: 6,
-			note: 'Nye saksbehandlere fra januar',
-			addedById: u.kari
-		}
-	]);
+	const wishCategories = await db
+		.insert(s.wishCategory)
+		.values([
+			{
+				name: 'Saksbehandling og arbeidsflyt',
+				description: 'Daglig arbeid i saker, frister og oppgaver.',
+				sortOrder: 1
+			},
+			{
+				name: 'BFK og maler',
+				description: 'Barnevernfaglig kvalitetssystem, maler og dokumenter.',
+				sortOrder: 2
+			},
+			{
+				name: 'Rapportering og styringsdata',
+				description: 'Rapporter, statistikk og oversikter for ledere.',
+				sortOrder: 3
+			},
+			{
+				name: 'Integrasjoner',
+				description: 'Arkiv, folkeregister, SvarUt og andre systemer.',
+				sortOrder: 4
+			},
+			{
+				name: 'Innbyggertjenester',
+				description: 'Digital dialog med barn, unge og familier.',
+				sortOrder: 5
+			},
+			{
+				name: 'Brukervennlighet',
+				description: 'Utseende, navigasjon og universell utforming.',
+				sortOrder: 6
+			}
+		])
+		.returning();
+	const wc = Object.fromEntries(wishCategories.map((cat) => [cat.name, cat.id]));
 
-	const requests = [
+	const wishes: {
+		author: string;
+		kommune: string;
+		category: string | null;
+		title: string;
+		description: string;
+		status: 'new' | 'reviewing' | 'planned' | 'done' | 'declined';
+		adminNote?: string;
+		age: number;
+	}[] = [
 		{
-			municipalityId: k['Tromsø'],
-			submittedById: u.ola,
-			status: 'new' as const,
-			message: 'Ønsker tilbud på superbrukerkurs for to personer i februar.',
-			items: [[p.superbrukerkurs, 2]] as const,
-			age: 1,
-			adminNote: ''
+			author: 'kari',
+			kommune: 'Bergen',
+			category: 'Saksbehandling og arbeidsflyt',
+			title: 'Samlet oversikt over samværsavtaler',
+			description:
+				'Vi ønsker en oversikt over alle aktive samværsavtaler per enhet, med filter på dato, slik at vi slipper å gå inn i hver sak.',
+			status: 'planned',
+			adminNote: 'Takk! Dette er tatt med i planen for neste versjon etter prioriteringsmøtet.',
+			age: 20
 		},
 		{
-			municipalityId: k.Trondheim,
-			submittedById: u.sara,
-			status: 'answered' as const,
-			message: 'Vi vurderer styringsdata til ledergruppen.',
-			items: [
-				[p['utvidet-styringsdata'], 1],
-				[p['utvidet-brukerstotte'], 1]
-			] as const,
-			age: 8,
-			adminNote: 'Tilbud er sendt på e-post.'
+			author: 'kari',
+			kommune: 'Bergen',
+			category: 'Rapportering og styringsdata',
+			title: 'Eksport av fristoversikten til Excel',
+			description: 'Ledergruppen vil gjerne ha fristoversikten som regneark før møtene.',
+			status: 'new',
+			age: 2
 		},
 		{
-			municipalityId: k['Bodø'],
-			submittedById: u.jonas,
-			status: 'in_progress' as const,
-			message: 'Vi starter i januar og trenger hjelp med innføring og migrering.',
-			items: [
-				[p.innforingspakke, 1],
-				[p.datamigrering, 1]
-			] as const,
-			age: 5,
-			adminNote: ''
+			author: 'ola',
+			kommune: 'Tromsø',
+			category: 'BFK og maler',
+			title: 'Kopiere tiltaksplan fra forrige periode',
+			description:
+				'Når en tiltaksplan skal fornyes, hadde det spart mye tid å kunne starte fra forrige plan.',
+			status: 'reviewing',
+			adminNote: 'Vi ser på dette sammen med flere kommuner som har meldt samme behov.',
+			age: 9
+		},
+		{
+			author: 'ola',
+			kommune: 'Tromsø',
+			category: null,
+			title: 'Varsel når en sak overføres til min enhet',
+			description: 'I dag oppdager vi overførte saker først når vi åpner saksoversikten.',
+			status: 'new',
+			age: 1
+		},
+		{
+			author: 'sara',
+			kommune: 'Trondheim',
+			category: 'Brukervennlighet',
+			title: 'Mørk modus i saksbehandlingen',
+			description: 'Flere hos oss jobber lange dager foran skjermen og ønsker et mørkt tema.',
+			status: 'declined',
+			adminNote: 'Ikke prioritert for 2027, men ønsket er notert.',
+			age: 30
+		},
+		{
+			author: 'jonas',
+			kommune: 'Bodø',
+			category: 'Integrasjoner',
+			title: 'Tydeligere feilmeldinger fra arkivintegrasjonen',
+			description:
+				'Når en journalføring feiler, er det vanskelig å se hva som er galt uten å kontakte IT.',
+			status: 'new',
+			age: 4
 		}
 	];
-	for (const r of requests) {
-		const [req] = await db
-			.insert(s.quoteRequest)
-			.values({
-				municipalityId: r.municipalityId,
-				submittedById: r.submittedById,
-				status: r.status,
-				message: r.message,
-				adminNote: r.adminNote,
-				createdAt: daysAgo(r.age)
-			})
-			.returning();
-		await db.insert(s.quoteRequestItem).values(
-			r.items.map(([prod, quantity]) => ({
-				requestId: req.id,
-				productId: prod.id,
-				productName: prod.name,
-				unitPriceNok: prod.priceNok,
-				priceUnit: prod.priceUnit,
-				quantity
-			}))
-		);
+	for (const w of wishes) {
+		await db.insert(s.wish).values({
+			authorId: u[w.author],
+			municipalityId: k[w.kommune],
+			categoryId: w.category ? wc[w.category] : null,
+			title: w.title,
+			description: w.description,
+			status: w.status,
+			adminNote: w.adminNote ?? '',
+			createdAt: daysAgo(w.age)
+		});
 	}
 
 	console.log(
-		`Seeded ${kommuner.length} kommuner, ${users.length} users, ${threads.length} threads, ${products.length} products.`
+		`Seeded ${kommuner.length} kommuner, ${users.length} users, ${threads.length} threads, ${products.length} products, ${wishes.length} wishes.`
 	);
 	console.log(
 		`Demo login: admin@kommuneportalen.no / kari.nordmann@bergen.kommune.no, password "${DEMO_PASSWORD}"`

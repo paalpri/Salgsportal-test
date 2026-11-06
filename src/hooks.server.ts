@@ -2,8 +2,6 @@ import { error, redirect } from '@sveltejs/kit';
 import { sequence, type Handle } from '@sveltejs/kit/hooks';
 import { building } from '$app/env';
 import { auth } from '#lib/server/auth.ts';
-import { enabledModuleKeys } from '#lib/server/modules.ts';
-import { moduleForPath } from '#lib/modules.ts';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 
 const publicPaths = ['/logg-inn', '/registrer'];
@@ -22,17 +20,9 @@ const handleAccess: Handle = async ({ event, resolve }) => {
 	const user = event.locals.user;
 	if (!user) redirect(303, `/logg-inn?redirectTo=${encodeURIComponent(pathname + search)}`);
 
-	const isAdmin = user.role === 'admin';
-	if (pathname === '/admin' || pathname.startsWith('/admin/')) {
-		if (!isAdmin) error(404, 'Siden finnes ikke');
-	}
-
-	event.locals.modules = await enabledModuleKeys();
-	const module = moduleForPath(pathname);
-	if (module && !isAdmin && !event.locals.modules.includes(module.key)) {
+	if ((pathname === '/admin' || pathname.startsWith('/admin/')) && user.role !== 'admin') {
 		error(404, 'Siden finnes ikke');
 	}
-
 	return resolve(event);
 };
 

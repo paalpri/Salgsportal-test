@@ -41,7 +41,7 @@
 				<ConfirmDelete
 					action="?/delete"
 					title="Slette produktet?"
-					description="Produktet fjernes fra katalogen og handlelister. Tidligere forespørsler beholder navn og pris."
+					description="Produktet fjernes fra katalogen for alle kommuner."
 					variant="outline"
 					success="Produktet er slettet"
 				/>
@@ -122,6 +122,15 @@
 							/>
 						</Field.Field>
 					</div>
+					<Field.Field data-invalid={!!errors.orderUrl}>
+						<Field.Label for="orderUrl">Lenke til bestilling</Field.Label>
+						<Input id="orderUrl" name="orderUrl" value={v('orderUrl')} placeholder="https://…" />
+						<Field.Description>
+							Hvor kommunen kjøper eller bestiller produktet. Uten lenke står det «Kontakt oss for
+							mer informasjon».
+						</Field.Description>
+						{#if errors.orderUrl}<Field.Error>{errors.orderUrl}</Field.Error>{/if}
+					</Field.Field>
 					<Field.Field data-invalid={!!errors.imageUrl}>
 						<Field.Label for="imageUrl">Bilde-URL</Field.Label>
 						<Input id="imageUrl" name="imageUrl" value={v('imageUrl')} placeholder="https://…" />

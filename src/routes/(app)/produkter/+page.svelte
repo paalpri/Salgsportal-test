@@ -10,7 +10,6 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
 	const chip =
 		'inline-flex items-center gap-1.5 rounded-sm bg-card px-3 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent';
 	const activeChip = 'bg-primary text-primary-foreground hover:bg-primary';
@@ -20,7 +19,7 @@
 
 <PageHeader
 	title="Moduler og tjenester"
-	description="Utvid Modulus Barn med nye moduler, integrasjoner, kurs og hjelp til innføring. Legg det dere trenger i handlelisten, så tar vi kontakt."
+	description="Utvid Modulus Barn med nye moduler, integrasjoner, kurs og hjelp til innføring. Hver modul lenker til der dere bestiller den."
 />
 
 <div class="mb-6 space-y-4">
@@ -48,7 +47,7 @@
 {#if data.products.length}
 	<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 		{#each data.products as product (product.id)}
-			<ProductCard {product} inCart={data.inCart.includes(product.id)} {canOrder} />
+			<ProductCard {product} />
 		{/each}
 	</div>
 {:else}

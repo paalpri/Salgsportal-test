@@ -45,7 +45,7 @@ test('members can start a thread, get a reply and mark it as the solution', asyn
 	await login(page, MEMBER);
 	await open(page, '/forum');
 	await page.getByRole('link', { name: 'Nytt innlegg' }).first().click();
-	await page.waitForLoadState('networkidle');
+	await expect(page).toHaveURL('/forum/ny');
 	await pick(page, 'Kategori', 'Bruk og arbeidsflyt');
 	await page.getByLabel('Tittel').fill(title);
 	await page.getByLabel('Innhold').fill('Vi trenger tall per kvartal.');
@@ -70,41 +70,6 @@ test('members can start a thread, get a reply and mark it as the solution', asyn
 	await expect(page.getByRole('link', { name: title })).toContainText('Løst');
 });
 
-test('shopping list flows from member request to admin answer', async ({ page, browser }) => {
-	await login(page, MEMBER);
-	await open(page, '/produkter/superbrukerkurs');
-	await page.getByLabel('Antall').fill('3');
-	await page.getByRole('button', { name: 'Legg i handlelisten' }).click();
-	await expect(page.getByRole('link', { name: '3 i handlelisten' })).toBeVisible();
-
-	await open(page, '/handleliste');
-	await expect(page.getByRole('link', { name: 'Superbrukerkurs' })).toBeVisible();
-	const message = unique('Gjerne i mars');
-	await page.getByPlaceholder('Melding til oss (valgfritt)').fill(message);
-	await page.getByRole('button', { name: 'Send forespørsel' }).click();
-	await expect(page.getByText('Handlelisten er tom')).toBeVisible();
-	await expect(page.getByText(`«${message}»`)).toBeVisible();
-
-	const admin = await browser.newPage();
-	await login(admin, ADMIN);
-	await open(admin, '/admin/foresporsler?status=new');
-	await admin
-		.getByRole('link', { name: /Bergen/ })
-		.first()
-		.click();
-	await expect(admin.getByText(message)).toBeVisible();
-	await pick(admin, 'Status', 'Besvart');
-	await admin.getByLabel('Svar til kommunen').fill('Tilbud er sendt på e-post.');
-	await admin.getByRole('button', { name: 'Lagre' }).click();
-	await expect(admin.getByText('Lagret')).toBeVisible();
-	await admin.close();
-
-	await page.reload();
-	const request = page.locator('li', { hasText: message });
-	await expect(request.getByText('Besvart')).toBeVisible();
-	await expect(request.getByText('Tilbud er sendt på e-post.')).toBeVisible();
-});
-
 test('admin publishes a campaign that members see on the dashboard', async ({ page, browser }) => {
 	const title = unique('Vinterkampanje');
 	await login(page, ADMIN);
@@ -127,26 +92,6 @@ test('admin publishes a campaign that members see on the dashboard', async ({ pa
 	await page.getByRole('alertdialog').getByRole('button', { name: 'Slett' }).click();
 	await expect(page).toHaveURL('/admin/innlegg');
 	await expect(page.getByText(title)).toHaveCount(0);
-});
-
-test('admin can switch a module off for members', async ({ page, browser }) => {
-	await login(page, ADMIN);
-	await open(page, '/admin/seksjoner');
-	const forumSwitch = page.getByRole('switch', { name: /Forum/ });
-	await forumSwitch.click();
-	await expect(forumSwitch).not.toBeChecked();
-
-	const member = await browser.newPage();
-	try {
-		await login(member, MEMBER);
-		await expect(member.getByRole('link', { name: 'Forum', exact: true })).toHaveCount(0);
-		const response = await member.goto('/forum');
-		expect(response?.status()).toBe(404);
-	} finally {
-		await member.close();
-		await forumSwitch.click();
-		await expect(forumSwitch).toBeChecked();
-	}
 });
 
 test('members cannot reach admin pages', async ({ page }) => {
@@ -203,4 +148,63 @@ test('front page shows the current driftsmelding and key figures', async ({ page
 	await expect(page.getByRole('link', { name: /Planlagt vedlikehold/ })).toBeVisible();
 	await expect(page.getByText('kommuner bruker Modulus Barn')).toBeVisible();
 	await expect(page.getByRole('heading', { name: 'Nytt i Modulus Barn' })).toBeVisible();
+});
+
+test('products link to where they are ordered, or ask the kommune to get in touch', async ({
+	page
+}) => {
+	await login(page, MEMBER);
+	await open(page, '/produkter/digitale-innbyggertjenester');
+	const order = page.getByRole('link', { name: 'Til bestilling' });
+	await expect(order).toHaveAttribute('href', /^https:\/\//);
+	await expect(order).toHaveAttribute('target', '_blank');
+
+	await open(page, '/produkter/superbrukerkurs');
+	await expect(page.getByRole('link', { name: 'Til bestilling' })).toHaveCount(0);
+	await expect(page.getByText('Kontakt oss for mer informasjon')).toBeVisible();
+});
+
+test('wishes are private to the author and visible to admins by category', async ({
+	page,
+	browser
+}) => {
+	const title = unique('Ønske om bedre søk i dokumenter');
+	await login(page, MEMBER);
+	await open(page, '/onsker');
+	await page.getByLabel('Hva ønsker dere?').fill(title);
+	await page
+		.getByLabel('Beskrivelse')
+		.fill('Vi vil kunne søke i innholdet i dokumentene, ikke bare titlene.');
+	await pick(page, 'Kategori', 'Saksbehandling og arbeidsflyt');
+	await page.getByRole('button', { name: 'Send ønsket' }).click();
+	await expect(page.getByRole('heading', { name: title })).toBeVisible();
+	await expect(page.getByText('Mottatt').first()).toBeVisible();
+
+	const other = await browser.newPage();
+	await login(other, 'ola.hansen@tromso.kommune.no');
+	await open(other, '/onsker');
+	await expect(other.getByText(title)).toHaveCount(0);
+	await expect(other.getByText('Samlet oversikt over samværsavtaler')).toHaveCount(0);
+	await other.close();
+
+	const admin = await browser.newPage();
+	await login(admin, ADMIN);
+	await open(admin, '/admin/onsker');
+	await admin.getByRole('link', { name: /Saksbehandling og arbeidsflyt/ }).click();
+	await expect(
+		admin.getByRole('link', { name: 'Kopiere tiltaksplan fra forrige periode' })
+	).toHaveCount(0);
+	await admin.getByRole('link', { name: title }).click();
+	await admin.waitForLoadState('networkidle');
+	await pick(admin, 'Status', 'Planlagt');
+	await admin.getByLabel('Svar til innsenderen').fill('Dette kommer i neste versjon.');
+	await admin.getByRole('button', { name: 'Lagre' }).click();
+	await expect(admin.getByText('Lagret')).toBeVisible();
+	await admin.close();
+
+	await page.reload();
+	const card = page.locator('li', { hasText: title });
+	await expect(card.getByText('Planlagt')).toBeVisible();
+	await expect(card.getByText('Dette kommer i neste versjon.')).toBeVisible();
+	await expect(card.getByRole('button', { name: 'Trekk tilbake' })).toHaveCount(0);
 });

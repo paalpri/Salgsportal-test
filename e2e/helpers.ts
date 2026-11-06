@@ -13,7 +13,7 @@ export async function login(page: Page, email: string, password = PASSWORD) {
 }
 
 export async function pick(page: Page, trigger: string, option: string) {
-	await page.getByLabel(trigger).click();
+	await page.getByRole('combobox', { name: trigger }).click();
 	await page.getByRole('option', { name: option, exact: true }).click();
 }
 

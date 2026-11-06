@@ -1,28 +1,22 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { withToast } from '#lib/forms.ts';
 	import { formatPrice } from '#lib/format.ts';
-	import { Button } from '#lib/components/ui/button/index.js';
+	import OrderLink from './order-link.svelte';
 	import Package from '@lucide/svelte/icons/package';
-	import Plus from '@lucide/svelte/icons/plus';
-	import Check from '@lucide/svelte/icons/check';
 
 	type Props = {
 		product: {
-			id: number;
 			slug: string;
 			name: string;
 			summary: string;
 			priceNok: number | null;
 			priceUnit: string | null;
 			imageUrl: string | null;
+			orderUrl: string | null;
 			isNew: boolean;
 			categoryName: string | null;
 		};
-		inCart?: boolean;
-		canOrder?: boolean;
 	};
-	let { product, inCart = false, canOrder = true }: Props = $props();
+	let { product }: Props = $props();
 </script>
 
 <article class="card-link group flex flex-col overflow-hidden rounded-lg bg-card">
@@ -55,20 +49,13 @@
 			>
 		</h3>
 		<p class="line-clamp-2 text-sm text-muted-foreground">{product.summary}</p>
-		<div class="mt-auto flex items-center justify-between gap-3 pt-4">
-			<span class="text-sm font-semibold">{formatPrice(product.priceNok, product.priceUnit)}</span>
-			{#if canOrder && inCart}
-				<Button href="/handleliste" size="sm" variant="secondary"><Check /> I listen</Button>
-			{:else if canOrder}
-				<form
-					method="post"
-					action="/produkter?/addToCart"
-					use:enhance={withToast('Lagt til i handlelisten')}
-				>
-					<input type="hidden" name="productId" value={product.id} />
-					<Button type="submit" size="sm"><Plus /> Legg til</Button>
-				</form>
-			{/if}
+		<p class="text-sm font-semibold">{formatPrice(product.priceNok, product.priceUnit)}</p>
+		<div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
+			<OrderLink url={product.orderUrl} />
+			<a
+				href="/produkter/{product.slug}"
+				class="text-sm font-semibold underline-offset-4 hover:underline">Les mer</a
+			>
 		</div>
 	</div>
 </article>

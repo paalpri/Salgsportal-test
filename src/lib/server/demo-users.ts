@@ -17,7 +17,7 @@ export const demoUsers = [
 		email: 'kari.nordmann@bergen.kommune.no',
 		name: 'Kari Nordmann',
 		label: 'Barnevernleder',
-		description: 'Bergen kommune. Har varer i handlelisten.'
+		description: 'Bergen kommune. Har sendt inn ønsker.'
 	},
 	{
 		key: 'saksbehandler',

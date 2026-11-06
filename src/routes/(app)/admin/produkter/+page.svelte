@@ -50,6 +50,7 @@
 								>Skjult</Badge
 							>{/if}
 						{#if p.isNew}<Badge class="bg-coral text-ink">Nyhet</Badge>{/if}
+						{#if !p.orderUrl}<Badge variant="outline">Uten bestillingslenke</Badge>{/if}
 					</Table.Cell>
 				</Table.Row>
 			{:else}

@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, ilike, or, type SQL } from 'drizzle-orm';
 import { db } from './db/index.ts';
-import { cartItem, product, productCategory } from './db/schema.ts';
+import { product, productCategory } from './db/schema.ts';
 
 export async function listProducts({
 	categoryId,
@@ -25,6 +25,7 @@ export async function listProducts({
 			priceNok: product.priceNok,
 			priceUnit: product.priceUnit,
 			imageUrl: product.imageUrl,
+			orderUrl: product.orderUrl,
 			isNew: product.isNew,
 			categoryName: productCategory.name
 		})
@@ -33,13 +34,4 @@ export async function listProducts({
 		.where(and(...filters))
 		.orderBy(desc(product.isNew), asc(product.name))
 		.limit(limit);
-}
-
-export async function cartProductIds(municipalityId: number | null) {
-	if (!municipalityId) return [];
-	const rows = await db
-		.select({ productId: cartItem.productId })
-		.from(cartItem)
-		.where(eq(cartItem.municipalityId, municipalityId));
-	return rows.map((r) => r.productId);
 }

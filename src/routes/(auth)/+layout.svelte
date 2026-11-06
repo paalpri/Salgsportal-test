@@ -18,12 +18,12 @@
 		{
 			icon: Package,
 			title: 'Moduler og tjenester',
-			text: 'Se hva som er nytt, og samle bestillingen i kommunens handleliste.'
+			text: 'Se hva som er nytt, og gå rett til der dere bestiller.'
 		},
 		{
 			icon: MessagesSquare,
 			title: 'Erfaringer fra andre kommuner',
-			text: 'Spør, svar og bidra til hvordan løsningen utvikles videre.'
+			text: 'Spør og svar i forumet, og send ønsker til videreutviklingen.'
 		}
 	];
 	const demo = $derived(

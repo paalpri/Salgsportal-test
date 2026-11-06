@@ -3,8 +3,8 @@
 Customer and community portal for the kommuner that use Modulus Barn, the barnevern solution from
 the DigiBarnevern project, delivered by Netcompany. It is not the case-management system itself: it is
 where the people who use and manage Modulus Barn follow what has changed (release notes, news,
-driftsmeldinger), see and order new modules, courses and services through a shared shopping list, and
-help each other in a forum, including requests for further development, which the kommuner prioritise
+driftsmeldinger), browse new modules, courses and services (each with a link to where it is ordered),
+help each other in a forum, and send wishes for further development, which the kommuner prioritise
 together. Netcompany admins manage all content from `/admin`.
 
 All text on the site is Norwegian (bokmål), including validation messages (zod `no` locale). Code and docs are in English.
@@ -67,7 +67,7 @@ a production build only shows it with `DEMO_LOGIN=true`. Never set that in produ
 ```
 src/
   hooks.server.ts          session lookup, login redirect, /admin and module gating
-  lib/modules.ts           registry of feature modules (nav, dashboard shortcuts, toggles)
+  lib/modules.ts           sections in the main navigation
   lib/server/
     auth.ts                better-auth config
     db/schema.ts           app tables (auth.schema.ts is generated)
@@ -79,14 +79,14 @@ src/
   routes/
     (auth)/                logg-inn, registrer
     (app)/                 everything behind login
-      nyheter/ forum/ produkter/ handleliste/ profil/
+      nyheter/ forum/ produkter/ onsker/ profil/
       admin/               innlegg, produkter, forum, foresporsler, brukere, kommuner, moduler
 ```
 
 **Access control** is done once in `hooks.server.ts`, so it also covers form actions (which skip
-layout loads): anonymous users are redirected to `/logg-inn`, `/admin/**` is 404 for non-admins, and
-routes of a disabled module are 404 for members. Ownership rules (edit your own forum posts, your own
-kommune's shopping list) are checked in each action.
+layout loads): anonymous users are redirected to `/logg-inn` and `/admin/**` is 404 for non-admins.
+Ownership rules (edit your own forum posts, see and withdraw your own wishes) are checked in each
+action and load.
 
 **Users and kommuner.** Each user belongs to at most one kommune (`user.municipality_id`). Users
 register themselves at `/registrer`; if the kommune has an email domain set, the address must match
@@ -100,23 +100,28 @@ newest kampanje as a banner.
 **Front page.** The welcome section at the top of `/` is the same for everyone and only admins can
 change it, in `/admin/forside` (with live preview), including the key figures (kommuner, users). It is stored in `site_content` as one JSON document
 per section; `readContent(key, defaults)` merges stored fields over code defaults, so more editable
-sections can be added the same way. Members can only write forum posts and edit their kommune's
-shopping list; products, prices, news and campaigns are admin-only.
+sections can be added the same way. Members can write forum posts and send wishes; products, prices,
+purchase links, news and campaigns are admin-only.
 
-**Shopping list and requests.** The list is shared by everyone in a kommune. Sending it creates a
-quote request with a copy of product names and prices, and empties the list. Admins set a status and
-reply in `/admin/foresporsler`; the kommune sees both on its shopping list page.
+**Products.** The portal does not sell anything. Each product can have a purchase link (`orderUrl`) to
+wherever the kommune actually orders it; external links open in a new tab. Without a link the product
+says «Kontakt oss for mer informasjon».
+
+**Wishlist (`/onsker`).** Separate from the forum. Members send wishes, optionally with a category,
+and only ever see their own. Admins see all wishes in `/admin/onsker`, filter by category and status,
+manage the categories, and set a status and reply that the author sees on their wishlist. Authors can
+withdraw a wish until an admin has started on it.
 
 ## Extending
 
-**A new feature module** (own menu item, can be switched off in `/admin/seksjoner`):
+**A new section** (own menu item):
 
-1. Add an entry to `src/lib/modules.ts` (`key`, `label`, `description`, `href`, `icon`).
+1. Add an entry to `src/lib/modules.ts` (`label`, `href`, `icon`).
 2. Create `src/routes/(app)/<href>/` with its pages.
 3. Add tables to `src/lib/server/db/schema.ts` and run `pnpm db:generate --name <name>` then
    `pnpm db:migrate`.
 
-Navigation, dashboard shortcuts, the toggle and 404 gating come from the registry.
+The sidebar menu is built from the registry.
 
 **A new simple admin list** (name plus a few fields, like kommuner or categories): define the table,
 then in the page's `+page.server.ts` export `actions = crudActions(table, zodSchema)` and render

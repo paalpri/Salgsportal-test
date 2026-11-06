@@ -13,8 +13,6 @@
 	let { data }: PageProps = $props();
 
 	const firstName = $derived(data.user.name.split(' ')[0]);
-	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
-	const ideas = '/forum?kategori=onsker-til-videreutvikling';
 </script>
 
 <svelte:head><title>Hjem · Modulus Barn</title></svelte:head>
@@ -84,41 +82,37 @@
 		</section>
 	{/if}
 
-	{#if data.modules.includes('forum')}
-		<div class="grid gap-12 lg:grid-cols-3 lg:gap-8">
-			<section class="lg:col-span-2">
-				<SectionHeader title="Siste fra forumet" href="/forum" linkLabel="Til forumet" />
-				{#if data.threads.length}
-					<ThreadList threads={data.threads} />
-				{:else}
-					<p class="rounded-lg bg-card p-6 text-sm text-muted-foreground">
-						Ingen innlegg ennå. Bli den første!
-					</p>
-				{/if}
-			</section>
-			<aside class="flex flex-col gap-4 rounded-lg bg-card p-6 md:p-8 lg:mt-12">
-				<Lightbulb class="size-8" strokeWidth={1.5} />
-				<h2 class="text-xl font-normal">Dere former Modulus Barn</h2>
-				<p class="text-sm text-muted-foreground">
-					Kommunene bestemmer i fellesskap hvordan løsningen skal utvikles videre. Har dere et ønske
-					eller en idé? Legg det inn, og støtt gjerne forslagene fra andre kommuner.
+	<div class="grid gap-12 lg:grid-cols-3 lg:gap-8">
+		<section class="lg:col-span-2">
+			<SectionHeader title="Siste fra forumet" href="/forum" linkLabel="Til forumet" />
+			{#if data.threads.length}
+				<ThreadList threads={data.threads} />
+			{:else}
+				<p class="rounded-lg bg-card p-6 text-sm text-muted-foreground">
+					Ingen innlegg ennå. Bli den første!
 				</p>
-				<div class="mt-auto flex flex-col gap-2 pt-2">
-					<Button href="/forum/ny?kategori=onsker-til-videreutvikling" class="w-full"
-						>Foreslå en forbedring</Button
-					>
-					<Button href={ideas} variant="ghost" class="w-full">Se ønskene fra andre kommuner</Button>
-				</div>
-			</aside>
-		</div>
-	{/if}
+			{/if}
+		</section>
+		<aside class="flex flex-col gap-4 rounded-lg bg-card p-6 md:p-8 lg:mt-12">
+			<Lightbulb class="size-8" strokeWidth={1.5} />
+			<h2 class="text-xl font-normal">Dere former Modulus Barn</h2>
+			<p class="text-sm text-muted-foreground">
+				Kommunene bestemmer i fellesskap hvordan løsningen skal utvikles videre. Har dere et ønske
+				eller en idé? Legg det på ønskelisten, så tar vi det med når kommunene prioriterer.
+			</p>
+			<div class="mt-auto flex flex-col gap-2 pt-2">
+				<Button href="/onsker#nytt-onske" class="w-full">Send et ønske</Button>
+				<Button href="/onsker" variant="ghost" class="w-full">Se mine ønsker</Button>
+			</div>
+		</aside>
+	</div>
 
 	{#if data.products.length}
 		<section>
 			<SectionHeader title="Nye moduler og tjenester" href="/produkter" linkLabel="Se alt" />
 			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{#each data.products as product (product.id)}
-					<ProductCard {product} inCart={data.inCart.includes(product.id)} {canOrder} />
+					<ProductCard {product} />
 				{/each}
 			</div>
 		</section>

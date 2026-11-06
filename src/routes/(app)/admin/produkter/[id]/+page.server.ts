@@ -42,6 +42,7 @@ const schema = z.object({
 	priceNok: optionalInt,
 	priceUnit: optionalText(40),
 	imageUrl: optionalUrl,
+	orderUrl: optionalUrl,
 	isNew: checkbox,
 	active: checkbox
 });

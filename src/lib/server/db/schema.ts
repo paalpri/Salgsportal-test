@@ -7,8 +7,7 @@ import {
 	pgEnum,
 	pgTable,
 	text,
-	timestamp,
-	unique
+	timestamp
 } from 'drizzle-orm/pg-core';
 import { user } from './auth.schema.ts';
 
@@ -117,73 +116,52 @@ export const product = pgTable('product', {
 	priceNok: integer(),
 	priceUnit: text(),
 	imageUrl: text(),
+	/** Where the kommune actually buys or orders the product; the portal only links to it. */
+	orderUrl: text(),
 	isNew: boolean().notNull().default(false),
 	active: boolean().notNull().default(true),
 	createdAt: createdAt(),
 	updatedAt: updatedAt()
 });
 
-export const cartItem = pgTable(
-	'cart_item',
+export const wishCategory = pgTable('wish_category', {
+	id: id(),
+	name: text().notNull(),
+	description: text().notNull().default(''),
+	sortOrder: integer().notNull().default(0),
+	createdAt: createdAt()
+});
+
+export const wishStatus = pgEnum('wish_status', [
+	'new',
+	'reviewing',
+	'planned',
+	'done',
+	'declined'
+]);
+
+/** Visible only to its author and to admins. */
+export const wish = pgTable(
+	'wish',
 	{
 		id: id(),
-		municipalityId: integer()
-			.notNull()
-			.references(() => municipality.id, { onDelete: 'cascade' }),
-		productId: integer()
-			.notNull()
-			.references(() => product.id, { onDelete: 'cascade' }),
-		quantity: integer().notNull().default(1),
-		note: text().notNull().default(''),
-		addedById: text().references(() => user.id, { onDelete: 'set null' }),
-		createdAt: createdAt()
-	},
-	(t) => [unique().on(t.municipalityId, t.productId)]
-);
-
-export const quoteStatus = pgEnum('quote_status', ['new', 'in_progress', 'answered', 'closed']);
-
-export const quoteRequest = pgTable(
-	'quote_request',
-	{
-		id: id(),
-		municipalityId: integer()
-			.notNull()
-			.references(() => municipality.id, { onDelete: 'restrict' }),
-		submittedById: text().references(() => user.id, { onDelete: 'set null' }),
-		status: quoteStatus().notNull().default('new'),
-		message: text().notNull().default(''),
+		authorId: text().references(() => user.id, { onDelete: 'set null' }),
+		municipalityId: integer().references(() => municipality.id, { onDelete: 'set null' }),
+		categoryId: integer().references(() => wishCategory.id, { onDelete: 'set null' }),
+		title: text().notNull(),
+		description: text().notNull(),
+		status: wishStatus().notNull().default('new'),
 		adminNote: text().notNull().default(''),
 		createdAt: createdAt(),
 		updatedAt: updatedAt()
 	},
-	(t) => [index().on(t.status, t.createdAt)]
+	(t) => [index().on(t.authorId, t.createdAt), index().on(t.status, t.createdAt)]
 );
-
-/** Product name and price are copied so a request stays readable after the catalog changes. */
-export const quoteRequestItem = pgTable('quote_request_item', {
-	id: id(),
-	requestId: integer()
-		.notNull()
-		.references(() => quoteRequest.id, { onDelete: 'cascade' }),
-	productId: integer().references(() => product.id, { onDelete: 'set null' }),
-	productName: text().notNull(),
-	unitPriceNok: integer(),
-	priceUnit: text(),
-	quantity: integer().notNull(),
-	note: text().notNull().default('')
-});
 
 /** Admin-edited page content, one JSON document per section (see #lib/site-content.ts). */
 export const siteContent = pgTable('site_content', {
 	key: text().primaryKey(),
 	data: jsonb().notNull(),
-	updatedAt: updatedAt()
-});
-
-export const moduleSetting = pgTable('module_setting', {
-	key: text().primaryKey(),
-	enabled: boolean().notNull().default(true),
 	updatedAt: updatedAt()
 });
 
@@ -205,21 +183,5 @@ export const productRelations = relations(product, ({ one }) => ({
 	category: one(productCategory, {
 		fields: [product.categoryId],
 		references: [productCategory.id]
-	})
-}));
-
-export const quoteRequestRelations = relations(quoteRequest, ({ one, many }) => ({
-	municipality: one(municipality, {
-		fields: [quoteRequest.municipalityId],
-		references: [municipality.id]
-	}),
-	submittedBy: one(user, { fields: [quoteRequest.submittedById], references: [user.id] }),
-	items: many(quoteRequestItem)
-}));
-
-export const quoteRequestItemRelations = relations(quoteRequestItem, ({ one }) => ({
-	request: one(quoteRequest, {
-		fields: [quoteRequestItem.requestId],
-		references: [quoteRequest.id]
 	})
 }));

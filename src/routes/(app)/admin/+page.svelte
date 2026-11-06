@@ -1,8 +1,7 @@
 <script lang="ts">
 	import PageHeader from '#lib/components/app/page-header.svelte';
-	import { quoteStatuses } from '#lib/quote-status.ts';
+	import WishStatusTag from '#lib/components/app/wish-status-tag.svelte';
 	import { formatDate } from '#lib/format.ts';
-	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import Users from '@lucide/svelte/icons/users';
@@ -10,17 +9,17 @@
 	import MessagesSquare from '@lucide/svelte/icons/messages-square';
 	import Package from '@lucide/svelte/icons/package';
 	import FileText from '@lucide/svelte/icons/file-text';
-	import Inbox from '@lucide/svelte/icons/inbox';
+	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import Plus from '@lucide/svelte/icons/plus';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const cards = $derived([
 		{
-			label: 'Nye forespørsler',
-			value: data.stats.newRequests,
-			icon: Inbox,
-			href: '/admin/foresporsler?status=new'
+			label: 'Nye ønsker',
+			value: data.stats.newWishes,
+			icon: Lightbulb,
+			href: '/admin/onsker?status=new'
 		},
 		{ label: 'Brukere', value: data.stats.users, icon: Users, href: '/admin/brukere' },
 		{
@@ -66,27 +65,31 @@
 
 <section class="mt-10 space-y-4">
 	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-normal md:text-2xl">Siste forespørsler</h2>
-		<Button href="/admin/foresporsler" variant="ghost" size="sm">Se alle</Button>
+		<h2 class="text-xl font-normal md:text-2xl">Siste ønsker</h2>
+		<Button href="/admin/onsker" variant="ghost" size="sm">Se alle</Button>
 	</div>
 	{#if data.recent.length}
 		<ul class="divide-y rounded-lg bg-card">
 			{#each data.recent as r (r.id)}
 				<li>
 					<a
-						href="/admin/foresporsler/{r.id}"
+						href="/admin/onsker/{r.id}"
 						class="flex items-center justify-between gap-4 p-4 hover:bg-muted/50"
 					>
 						<span>
-							<span class="font-medium">#{r.id} · {r.municipalityName}</span>
-							<span class="block text-sm text-muted-foreground">{formatDate(r.createdAt)}</span>
+							<span class="font-medium">{r.title}</span>
+							<span class="block text-sm text-muted-foreground"
+								>{formatDate(r.createdAt)}{r.municipalityName
+									? ` · ${r.municipalityName}`
+									: ''}</span
+							>
 						</span>
-						<Badge variant={quoteStatuses[r.status].variant}>{quoteStatuses[r.status].label}</Badge>
+						<WishStatusTag status={r.status} />
 					</a>
 				</li>
 			{/each}
 		</ul>
 	{:else}
-		<p class="text-sm text-muted-foreground">Ingen forespørsler ennå.</p>
+		<p class="text-sm text-muted-foreground">Ingen ønsker ennå.</p>
 	{/if}
 </section>
