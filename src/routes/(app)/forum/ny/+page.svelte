@@ -23,7 +23,7 @@
 <div class="mx-auto max-w-2xl">
 	<PageHeader
 		title="Nytt innlegg"
-		description="Beskriv spørsmålet eller erfaringen din. Ikke del personopplysninger."
+		description="Beskriv spørsmålet eller erfaringen din, så kan andre kommuner hjelpe. Ikke del personopplysninger eller detaljer fra enkeltsaker."
 	/>
 	<Card.Root>
 		<Card.Content>

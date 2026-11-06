@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { formatDate } from '#lib/format.ts';
+	import PostKindTag from '#lib/components/app/post-kind-tag.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -12,7 +13,7 @@
 	const post = $derived(data.post);
 </script>
 
-<svelte:head><title>{post.title} · Kommuneportalen</title></svelte:head>
+<svelte:head><title>{post.title} · Modulus Barn</title></svelte:head>
 
 <article class="mx-auto max-w-3xl space-y-6">
 	<div class="flex items-center justify-between">
@@ -35,9 +36,7 @@
 
 	<header class="space-y-3">
 		<div class="flex items-center gap-2 text-sm text-muted-foreground">
-			{#if post.kind === 'ad'}<span
-					class="rounded-sm bg-coral px-1.5 py-0.5 text-xs font-semibold text-ink">Kampanje</span
-				>{/if}
+			<PostKindTag kind={post.kind} />
 			{#if post.publishedAt}<time>{formatDate(post.publishedAt)}</time>{/if}
 			{#if data.authorName}<span>· {data.authorName}</span>{/if}
 		</div>

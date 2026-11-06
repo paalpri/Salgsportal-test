@@ -13,6 +13,17 @@ const db = drizzle(client, { schema: s, casing: 'snake_case' });
 const DEMO_PASSWORD = 'Passord123!';
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);
 
+type SeedThread = {
+	category: string;
+	author: string;
+	title: string;
+	body: string;
+	age: number;
+	pinned?: boolean;
+	locked?: boolean;
+	replies: { author: string; body: string; accepted?: boolean }[];
+};
+
 async function main() {
 	const existing = await db.select({ id: s.user.id }).from(s.user).limit(1);
 	if (existing.length) {
@@ -28,8 +39,8 @@ async function main() {
 				['Bergen', '4601', 'Vestland', 'bergen.kommune.no'],
 				['Trondheim', '5001', 'Trøndelag', 'trondheim.kommune.no'],
 				['Stavanger', '1103', 'Rogaland', 'stavanger.kommune.no'],
-				['Tromsø', '5501', 'Troms', 'tromso.kommune.no'],
 				['Kristiansand', '4204', 'Agder', 'kristiansand.kommune.no'],
+				['Tromsø', '5501', 'Troms', 'tromso.kommune.no'],
 				['Bodø', '1804', 'Nordland', 'bodo.kommune.no'],
 				['Ålesund', '1508', 'Møre og Romsdal', 'alesund.kommune.no'],
 				['Drammen', '3301', 'Buskerud', 'drammen.kommune.no'],
@@ -44,6 +55,7 @@ async function main() {
 	const password = await hashPassword(DEMO_PASSWORD);
 	const people = [
 		{
+			key: 'admin',
 			name: 'Ingrid Solberg',
 			email: 'admin@kommuneportalen.no',
 			role: 'admin',
@@ -51,6 +63,7 @@ async function main() {
 			jobTitle: 'Kundeansvarlig, Netcompany'
 		},
 		{
+			key: 'kari',
 			name: 'Kari Nordmann',
 			email: 'kari.nordmann@bergen.kommune.no',
 			role: 'user',
@@ -58,6 +71,7 @@ async function main() {
 			jobTitle: 'Barnevernleder'
 		},
 		{
+			key: 'ola',
 			name: 'Ola Hansen',
 			email: 'ola.hansen@tromso.kommune.no',
 			role: 'user',
@@ -65,6 +79,7 @@ async function main() {
 			jobTitle: 'Saksbehandler'
 		},
 		{
+			key: 'sara',
 			name: 'Sara Berg',
 			email: 'sara.berg@trondheim.kommune.no',
 			role: 'user',
@@ -72,16 +87,27 @@ async function main() {
 			jobTitle: 'Fagkonsulent'
 		},
 		{
+			key: 'jonas',
 			name: 'Jonas Lie',
 			email: 'jonas.lie@bodo.kommune.no',
 			role: 'user',
 			municipalityId: k['Bodø'],
-			jobTitle: 'Systemansvarlig'
+			jobTitle: 'Fagsystemansvarlig'
 		}
 	];
 	const users = await db
 		.insert(s.user)
-		.values(people.map((p) => ({ ...p, id: crypto.randomUUID(), emailVerified: true })))
+		.values(
+			people.map((p) => ({
+				name: p.name,
+				email: p.email,
+				role: p.role,
+				municipalityId: p.municipalityId,
+				jobTitle: p.jobTitle,
+				id: crypto.randomUUID(),
+				emailVerified: true
+			}))
+		)
 		.returning();
 	await db.insert(s.account).values(
 		users.map((u) => ({
@@ -94,115 +120,149 @@ async function main() {
 			updatedAt: new Date()
 		}))
 	);
-	const [admin, kari, ola, sara, jonas] = users.map((u) => u.id);
+	const u = Object.fromEntries(people.map((p, i) => [p.key, users[i].id]));
 
 	const categories = await db
 		.insert(s.forumCategory)
 		.values([
 			{
-				name: 'Spørsmål og svar',
-				slug: 'sporsmal-og-svar',
-				description: 'Still spørsmål om bruk av systemet.',
+				name: 'Bruk og arbeidsflyt',
+				slug: 'bruk-og-arbeidsflyt',
+				description: 'Spørsmål om daglig bruk av Modulus Barn.',
 				sortOrder: 1
 			},
 			{
-				name: 'Rutiner og maler',
-				slug: 'rutiner-og-maler',
-				description: 'Del maler, rutiner og god praksis.',
+				name: 'BFK og faglige rutiner',
+				slug: 'bfk-og-faglige-rutiner',
+				description: 'Barnevernfaglig kvalitetssystem, maler og god praksis.',
 				sortOrder: 2
 			},
 			{
 				name: 'Integrasjoner',
 				slug: 'integrasjoner',
-				description: 'Folkeregister, SvarUt, arkiv og andre fagsystemer.',
+				description: 'Bekymringsmeldinger, barnevernsregisteret, folkeregisteret, arkiv og SvarUt.',
 				sortOrder: 3
 			},
 			{
-				name: 'Opplæring',
-				slug: 'opplaering',
-				description: 'Kurs, onboarding og kompetanse.',
+				name: 'Rapportering og styring',
+				slug: 'rapportering-og-styring',
+				description: 'Statistikk, styringsdata og rapporter til ledelsen.',
 				sortOrder: 4
 			},
 			{
-				name: 'Ønsker og forslag',
-				slug: 'onsker-og-forslag',
-				description: 'Forslag til ny funksjonalitet.',
+				name: 'Innføring og oppstart',
+				slug: 'innforing-og-oppstart',
+				description: 'For kommuner som er i gang med å ta i bruk Modulus Barn.',
 				sortOrder: 5
+			},
+			{
+				name: 'Opplæring og superbrukere',
+				slug: 'opplaering-og-superbrukere',
+				description: 'Kurs, opplæringsopplegg og superbrukernettverk.',
+				sortOrder: 6
+			},
+			{
+				name: 'Ønsker til videreutvikling',
+				slug: 'onsker-til-videreutvikling',
+				description: 'Foreslå forbedringer. Kommunene prioriterer videreutviklingen i fellesskap.',
+				sortOrder: 7
 			}
 		])
 		.returning();
 	const c = Object.fromEntries(categories.map((cat) => [cat.slug, cat.id]));
 
-	const threads: {
-		categoryId: number;
-		authorId: string;
-		title: string;
-		body: string;
-		age: number;
-		pinned?: boolean;
-		locked?: boolean;
-		replies: { authorId: string; body: string; accepted?: boolean }[];
-	}[] = [
+	const threads: SeedThread[] = [
 		{
-			categoryId: c['sporsmal-og-svar'],
-			authorId: admin,
+			category: 'bruk-og-arbeidsflyt',
+			author: 'admin',
 			title: 'Velkommen til forumet – les dette først',
-			body: 'Her kan ansatte i kommunene hjelpe hverandre med spørsmål om barnevernssystemet.\n\nHusk: Ikke del personopplysninger eller detaljer fra enkeltsaker i forumet. Bruk generelle eksempler.',
+			body: 'Dette forumet er for dere som bruker og forvalter Modulus Barn i kommunene. Still spørsmål, del rutiner og fortell hva som fungerer – og hva som ikke gjør det.\n\nTre enkle regler:\n• Del aldri personopplysninger eller detaljer fra enkeltsaker. Bruk generelle eller oppdiktede eksempler.\n• Marker svaret som løste problemet, så finner andre det raskere.\n• Feil som haster meldes til brukerstøtte, ikke her.\n\nVi i Netcompany følger med og svarer når vi kan.',
 			age: 30,
 			pinned: true,
 			locked: true,
 			replies: []
 		},
 		{
-			categoryId: c['sporsmal-og-svar'],
-			authorId: ola,
-			title: 'Hvordan setter dere opp fristvarsler for undersøkelsessaker?',
-			body: 'Vi ønsker varsel to uker før fristen går ut, men får bare varsel samme dag. Er det noen som har fått til dette?',
+			category: 'bruk-og-arbeidsflyt',
+			author: 'ola',
+			title: 'Fristvarsler i undersøkelsesfasen – hvordan har dere satt det opp?',
+			body: 'Vi vil ha varsel to uker før fristen for undersøkelse går ut, men får bare varsel samme dag. Er det noen som har fått til dette i Modulus Barn?',
 			age: 3,
 			replies: [
 				{
-					authorId: kari,
+					author: 'kari',
 					body: 'Gå til Innstillinger → Frister → Varsling og legg inn «14 dager før» som ekstra varsel. Det må gjøres per enhet.',
 					accepted: true
 				},
 				{
-					authorId: sara,
-					body: 'Vi gjorde det samme i Trondheim. Husk å lagre én gang per enhet, ellers gjelder det bare din egen.'
+					author: 'sara',
+					body: 'Samme hos oss i Trondheim. Husk å lagre for hver enhet, ellers gjelder det bare din egen.'
 				},
-				{ authorId: ola, body: 'Takk begge to, det fungerte!' }
+				{ author: 'ola', body: 'Takk begge to, det fungerte!' }
 			]
 		},
 		{
-			categoryId: c['rutiner-og-maler'],
-			authorId: kari,
-			title: 'Mal for tiltaksplan – deler gjerne vår',
-			body: 'Vi har laget en ny mal for tiltaksplan med tydeligere mål og evalueringspunkter. Si fra om dere vil ha den, så legger jeg den ut i maldelingen.',
-			age: 6,
-			replies: [{ authorId: jonas, body: 'Ja takk! Vi holder på å revidere våre maler nå.' }]
-		},
-		{
-			categoryId: c.integrasjoner,
-			authorId: jonas,
-			title: 'Erfaringer med integrasjon mot SvarUt?',
-			body: 'Vi vurderer SvarUt-integrasjonen. Hvor lang tid tok oppsettet hos dere, og trengte dere hjelp fra IT?',
-			age: 9,
+			category: 'innforing-og-oppstart',
+			author: 'jonas',
+			title: 'Vi starter med Modulus Barn i januar – tips til innføringen?',
+			body: 'Bodø går over til Modulus Barn i januar. Hva skulle dere ønske at dere visste før dere startet? Vi lurer særlig på opplæring, og hvor mye tid vi bør sette av til datamigrering.',
+			age: 2,
 			replies: [
 				{
-					authorId: sara,
-					body: 'Oppsettet tok et par dager. Vi trengte IT til sertifikatet, resten gjorde vi selv.'
+					author: 'kari',
+					body: 'Sett av mer tid til opplæring enn dere tror, og bygg et superbrukernettverk tidlig. Vi hadde én superbruker per team, og det hjalp mye de første ukene.'
+				},
+				{
+					author: 'sara',
+					body: 'Migreringen gikk greit hos oss, men rydd i gamle saker før dere starter. Det sparer mye tid i testmigreringen.'
 				}
 			]
 		},
 		{
-			categoryId: c['onsker-og-forslag'],
-			authorId: sara,
-			title: 'Ønske: bedre oversikt over samværsavtaler',
-			body: 'Det hadde vært fint med en samlet oversikt over alle aktive samværsavtaler per enhet, med filter på dato.',
-			age: 12,
+			category: 'bfk-og-faglige-rutiner',
+			author: 'kari',
+			title: 'Vår mal for tiltaksplan i BFK – deler gjerne',
+			body: 'Vi har laget en mal for tiltaksplan med tydeligere mål og evalueringspunkter, basert på BFK. Si fra om dere vil ha den, så legger jeg den ut her.',
+			age: 6,
+			replies: [{ author: 'jonas', body: 'Ja takk! Vi går gjennom malene våre før oppstart.' }]
+		},
+		{
+			category: 'integrasjoner',
+			author: 'jonas',
+			title: 'Erfaringer med arkivintegrasjonen (Noark 5)?',
+			body: 'Hvor lang tid tok oppsettet av arkivintegrasjonen hos dere, og trengte dere hjelp fra IT eller arkivleverandøren?',
+			age: 9,
 			replies: [
 				{
-					authorId: admin,
-					body: 'Takk for forslaget! Dette er med i planleggingen av neste versjon.'
+					author: 'sara',
+					body: 'Et par dager. Vi trengte IT til sertifikatet og arkivleverandøren til å åpne tjenesten. Resten gjorde vi selv.'
+				}
+			]
+		},
+		{
+			category: 'rapportering-og-styring',
+			author: 'sara',
+			title: 'Hvilke rapporter bruker dere i ledermøtene?',
+			body: 'Vi skal lage en fast rapportpakke til ledermøtene. Hvilke rapporter eller nøkkeltall fra Modulus Barn bruker dere mest?',
+			age: 11,
+			replies: [
+				{
+					author: 'kari',
+					body: 'Fristoversikten per enhet og antall åpne undersøkelser. Vi tar dem ut hver måned.'
+				}
+			]
+		},
+		{
+			category: 'onsker-til-videreutvikling',
+			author: 'sara',
+			title: 'Ønske: samlet oversikt over samværsavtaler',
+			body: 'Det hadde vært fint med en samlet oversikt over alle aktive samværsavtaler per enhet, med filter på dato. Er det flere som savner dette?',
+			age: 13,
+			replies: [
+				{ author: 'ola', body: 'Ja, det savner vi også i Tromsø.' },
+				{
+					author: 'admin',
+					body: 'Takk for innspillet! Vi tar det med til neste prioriteringsmøte med kommunene.'
 				}
 			]
 		}
@@ -213,8 +273,8 @@ async function main() {
 		const [thread] = await db
 			.insert(s.forumThread)
 			.values({
-				categoryId: t.categoryId,
-				authorId: t.authorId,
+				categoryId: c[t.category],
+				authorId: u[t.author],
 				title: t.title,
 				body: t.body,
 				pinned: t.pinned ?? false,
@@ -228,7 +288,7 @@ async function main() {
 			last = new Date(created.getTime() + (i + 1) * 3_600_000 * 5);
 			const [reply] = await db
 				.insert(s.forumReply)
-				.values({ threadId: thread.id, authorId: r.authorId, body: r.body, createdAt: last })
+				.values({ threadId: thread.id, authorId: u[r.author], body: r.body, createdAt: last })
 				.returning();
 			if (r.accepted) {
 				await db
@@ -249,26 +309,32 @@ async function main() {
 			{
 				name: 'Moduler',
 				slug: 'moduler',
-				description: 'Funksjonalitet i barnevernssystemet.',
+				description: 'Ny funksjonalitet i Modulus Barn.',
 				sortOrder: 1
 			},
 			{
 				name: 'Integrasjoner',
 				slug: 'integrasjoner',
-				description: 'Koble systemet til andre løsninger.',
+				description: 'Koble Modulus Barn til kommunens andre systemer.',
 				sortOrder: 2
+			},
+			{
+				name: 'Innføring og migrering',
+				slug: 'innforing-og-migrering',
+				description: 'Hjelp til å ta i bruk løsningen.',
+				sortOrder: 3
 			},
 			{
 				name: 'Kurs og opplæring',
 				slug: 'kurs-og-opplaering',
-				description: 'Kurs for saksbehandlere og superbrukere.',
-				sortOrder: 3
+				description: 'Kurs for saksbehandlere, ledere og superbrukere.',
+				sortOrder: 4
 			},
 			{
-				name: 'Tjenester',
-				slug: 'tjenester',
-				description: 'Rådgivning, migrering og support.',
-				sortOrder: 4
+				name: 'Brukerstøtte og tjenester',
+				slug: 'brukerstotte-og-tjenester',
+				description: 'Støtte og rådgivning i drift.',
+				sortOrder: 5
 			}
 		])
 		.returning();
@@ -279,71 +345,94 @@ async function main() {
 		.values([
 			{
 				categoryId: pc.moduler,
-				name: 'Barnevern Kjerne',
-				slug: 'barnevern-kjerne',
-				summary: 'Saksbehandling, journal og fristoppfølging i én løsning.',
+				name: 'Digitale innbyggertjenester',
+				slug: 'digitale-innbyggertjenester',
+				summary: 'Sikker digital dialog med barn, unge og familier.',
 				description:
-					'Kjernemodulen dekker hele saksløpet fra bekymringsmelding til tiltak og evaluering. Inkluderer journalføring, dokumentproduksjon, fristoppfølging og tilgangsstyring.',
-				priceNok: 185000,
-				priceUnit: 'per år'
+					'Gi barn, unge og familier innsyn i egen sak og mulighet til å sende og motta dokumenter digitalt. Modulen rulles ut gradvis i samarbeid med kommunene.',
+				priceNok: 60000,
+				priceUnit: 'per år',
+				isNew: true
 			},
 			{
 				categoryId: pc.moduler,
-				name: 'Mobil saksbehandling',
-				slug: 'mobil-saksbehandling',
-				summary: 'Gjør hjemmebesøk og samtaler enklere fra nettbrett og mobil.',
+				name: 'Mobil arbeidsflate',
+				slug: 'mobil-arbeidsflate',
+				summary: 'Dokumenter hjemmebesøk og samtaler fra nettbrett og mobil.',
 				description:
-					'Skriv notater, ta signaturer og se saksinformasjon på farten. Data lagres kryptert og synkroniseres når du er tilkoblet.',
+					'Skriv notater, ta signaturer og se saksinformasjon på farten. Data lagres kryptert og synkroniseres når du er på nett igjen.',
 				priceNok: 45000,
 				priceUnit: 'per år',
 				isNew: true
 			},
 			{
 				categoryId: pc.moduler,
-				name: 'Innsikt og rapportering',
-				slug: 'innsikt-og-rapportering',
-				summary: 'Dashbord, nøkkeltall og KOSTRA-rapportering.',
+				name: 'Utvidet styringsdata',
+				slug: 'utvidet-styringsdata',
+				summary: 'Dashbord og nøkkeltall for ledere i barneverntjenesten.',
 				description:
-					'Få oversikt over frister, saksmengde og tiltak per enhet, og lever KOSTRA-rapportering med noen få klikk.',
+					'Følg frister, saksmengde og tiltak per enhet, og hent ut rapporter til ledermøter og rapportering med noen få klikk.',
 				priceNok: 38000,
 				priceUnit: 'per år',
 				isNew: true
 			},
 			{
 				categoryId: pc.integrasjoner,
-				name: 'Folkeregister-integrasjon',
-				slug: 'folkeregister-integrasjon',
-				summary: 'Automatisk oppslag og oppdatering mot Folkeregisteret.',
+				name: 'Arkivintegrasjon (Noark 5)',
+				slug: 'arkivintegrasjon-noark-5',
+				summary: 'Arkiver dokumenter automatisk i kommunens sak/arkiv-system.',
 				description:
-					'Hent og oppdater personopplysninger direkte fra Folkeregisteret, med logging av alle oppslag.',
-				priceNok: 25000,
-				priceUnit: 'per år'
+					'Støtter Noark 5-baserte arkivsystemer. Prisen avhenger av arkivleverandør og oppsett.',
+				priceNok: null,
+				priceUnit: null
 			},
 			{
 				categoryId: pc.integrasjoner,
-				name: 'SvarUt/SvarInn',
+				name: 'KS SvarUt og SvarInn',
 				slug: 'svarut-svarinn',
 				summary: 'Send og motta digital post gjennom KS FIKS.',
 				description:
-					'Send brev digitalt til innbyggere og virksomheter, og motta svar rett i saken.',
+					'Send brev digitalt til innbyggere og virksomheter, og få svarene rett inn i saken.',
 				priceNok: 18000,
 				priceUnit: 'per år'
 			},
 			{
 				categoryId: pc.integrasjoner,
-				name: 'Arkivintegrasjon (Noark 5)',
-				slug: 'arkivintegrasjon-noark-5',
-				summary: 'Arkiver dokumenter automatisk i kommunens sak/arkiv-system.',
-				description: 'Støtter Noark 5-baserte arkivsystemer. Pris avhenger av arkivleverandør.',
+				name: 'Økonomiintegrasjon',
+				slug: 'okonomiintegrasjon',
+				summary: 'Overfør utbetalinger og tiltakskostnader til økonomisystemet.',
+				description:
+					'Unngå dobbeltregistrering ved å sende utbetalinger og kostnader for tiltak direkte til kommunens økonomisystem.',
+				priceNok: 22000,
+				priceUnit: 'per år'
+			},
+			{
+				categoryId: pc['innforing-og-migrering'],
+				name: 'Innføringspakke for nye kommuner',
+				slug: 'innforingspakke',
+				summary: 'Prosjektledelse, oppsett og opplæring fra start til drift.',
+				description:
+					'Vi følger dere gjennom hele innføringen: planlegging, konfigurasjon, opplæring av superbrukere og oppfølging de første månedene i drift.',
+				priceNok: null,
+				priceUnit: null
+			},
+			{
+				categoryId: pc['innforing-og-migrering'],
+				name: 'Datamigrering',
+				slug: 'datamigrering',
+				summary: 'Vi flytter historikken fra dagens fagsystem trygt over.',
+				description:
+					'Kartlegging, testmigrering og endelig overføring med kvalitetskontroll underveis.',
 				priceNok: null,
 				priceUnit: null
 			},
 			{
 				categoryId: pc['kurs-og-opplaering'],
-				name: 'Grunnopplæring for saksbehandlere',
-				slug: 'kurs-grunnopplaering',
-				summary: 'Heldagskurs i daglig bruk av systemet.',
-				description: 'Praktisk kurs med øvingsoppgaver. Holdes digitalt eller hos dere.',
+				name: 'Grunnkurs i Modulus Barn',
+				slug: 'grunnkurs',
+				summary: 'Heldagskurs i daglig bruk av løsningen.',
+				description:
+					'Praktisk kurs med øvingsoppgaver for nye saksbehandlere. Holdes digitalt eller hos dere.',
 				priceNok: 4900,
 				priceUnit: 'per deltaker'
 			},
@@ -352,26 +441,28 @@ async function main() {
 				name: 'Superbrukerkurs',
 				slug: 'superbrukerkurs',
 				summary: 'For dere som skal hjelpe kollegaer og administrere oppsett.',
-				description: 'To dager med fokus på oppsett, maler, tilganger og feilsøking.',
+				description:
+					'To dager med oppsett, maler, tilganger og feilsøking. Anbefales for minst én person per team.',
 				priceNok: 7900,
 				priceUnit: 'per deltaker',
 				isNew: true
 			},
 			{
-				categoryId: pc.tjenester,
-				name: 'Migrering fra eksisterende system',
-				slug: 'migrering',
-				summary: 'Vi flytter historikken deres trygt over.',
-				description: 'Kartlegging, testmigrering og endelig overføring med kvalitetskontroll.',
-				priceNok: null,
-				priceUnit: null
+				categoryId: pc['kurs-og-opplaering'],
+				name: 'BFK i praksis',
+				slug: 'bfk-i-praksis',
+				summary: 'Halvdagskurs i barnevernfaglig kvalitetssystem i saksarbeidet.',
+				description:
+					'Hvordan BFK gir faglig og juridisk støtte gjennom alle faser av en barnevernssak, med eksempler fra kommuner som bruker det i dag.',
+				priceNok: 3500,
+				priceUnit: 'per deltaker'
 			},
 			{
-				categoryId: pc.tjenester,
-				name: 'Utvidet support',
-				slug: 'utvidet-support',
-				summary: 'Telefonsupport 08–20 og egen kontaktperson.',
-				description: 'Raskere responstid, egen kontaktperson og kvartalsvise statusmøter.',
+				categoryId: pc['brukerstotte-og-tjenester'],
+				name: 'Utvidet brukerstøtte',
+				slug: 'utvidet-brukerstotte',
+				summary: 'Telefonstøtte 08–20 og egen kontaktperson.',
+				description: 'Raskere responstid, egen kontaktperson og faste statusmøter hvert kvartal.',
 				priceNok: 30000,
 				priceUnit: 'per år'
 			}
@@ -382,58 +473,85 @@ async function main() {
 	await db.insert(s.post).values([
 		{
 			kind: 'ad',
-			title: 'Ny modul: Mobil saksbehandling',
-			slug: 'ny-modul-mobil-saksbehandling',
-			excerpt: 'Gjør hjemmebesøk og samtaler enklere – 20 % introduksjonsrabatt ut året.',
-			body: 'Mobil saksbehandling lar dere skrive notater, ta signaturer og se saksinformasjon på nettbrett og mobil.\n\nBestiller dere før nyttår, får dere 20 % rabatt første år.',
+			title: 'Ny modul: Digitale innbyggertjenester',
+			slug: 'ny-modul-digitale-innbyggertjenester',
+			excerpt:
+				'Gi barn og familier innsyn og digital dialog. Nå tilgjengelig for alle kommuner som bruker Modulus Barn.',
+			body: 'Med digitale innbyggertjenester kan barn, unge og familier se status i egen sak og sende og motta dokumenter digitalt.\n\nModulen rulles ut gradvis. Legg den i handlelisten, så tar vi kontakt om oppstart.',
 			ctaLabel: 'Se modulen',
-			ctaUrl: '/produkter/mobil-saksbehandling',
+			ctaUrl: '/produkter/digitale-innbyggertjenester',
 			published: true,
 			pinned: true,
-			authorId: admin,
+			authorId: u.admin,
 			publishedAt: daysAgo(1)
 		},
 		{
 			kind: 'ad',
 			title: 'Kursdager våren 2027',
 			slug: 'kursdager-varen-2027',
-			excerpt: 'Meld på saksbehandlere til praktiske kurs i Oslo, Bergen og Trondheim.',
-			body: 'Vi arrangerer grunnopplæring og superbrukerkurs i tre byer. Legg kurset i handlelisten med antall deltakere, så tar vi kontakt.',
-			ctaLabel: 'Se kurs',
-			ctaUrl: '/produkter/kurs-grunnopplaering',
+			excerpt: 'Grunnkurs, superbrukerkurs og BFK i praksis i Oslo, Bergen, Trondheim og Tromsø.',
+			body: 'Meld på saksbehandlere og superbrukere. Legg kurset i handlelisten med antall deltakere, så sender vi datoer.',
+			ctaLabel: 'Se kursene',
+			ctaUrl: '/produkter?kategori=kurs-og-opplaering',
 			published: true,
-			authorId: admin,
+			authorId: u.admin,
 			publishedAt: daysAgo(4)
 		},
 		{
-			kind: 'news',
-			title: 'Versjon 4.2 er rullet ut',
-			slug: 'versjon-4-2',
-			excerpt: 'Raskere søk, nye fristvarsler og forbedret dokumentproduksjon.',
-			body: 'Versjon 4.2 er nå tilgjengelig for alle kommuner.\n\nNyheter:\n• Søket er opptil tre ganger raskere\n• Fristvarsler kan settes flere dager før fristen\n• Dokumentmaler støtter nå flere flettefelt',
+			kind: 'release',
+			title: 'Modulus Barn 2026.4: raskere søk og tidligere fristvarsler',
+			slug: 'modulus-barn-2026-4',
+			excerpt:
+				'Søket er opptil tre ganger raskere, og fristvarsler kan nå settes flere dager før fristen går ut.',
+			body: 'Versjon 2026.4 er rullet ut til alle kommuner.\n\nNytt i denne versjonen:\n• Søket er opptil tre ganger raskere\n• Fristvarsler kan settes flere dager før fristen\n• Flere flettefelt i dokumentmalene\n• Retting av feil ved utskrift av tiltaksplaner',
 			published: true,
-			authorId: admin,
+			authorId: u.admin,
 			publishedAt: daysAgo(2)
 		},
 		{
-			kind: 'news',
-			title: 'Endringer i barnevernsloven – slik er systemet oppdatert',
-			slug: 'endringer-i-barnevernsloven',
-			excerpt: 'Oversikt over endringene og hva de betyr for dere som bruker systemet.',
-			body: 'Vi har oppdatert maler, frister og rapporter i tråd med regelverksendringene. Se brukerveiledningen for detaljer.',
+			kind: 'ops',
+			title: 'Planlagt vedlikehold 14. november kl. 22–24',
+			slug: 'planlagt-vedlikehold-14-november',
+			excerpt: 'Modulus Barn er utilgjengelig i to timer mens vi oppgraderer driftsplattformen.',
+			body: 'Vi oppgraderer driftsplattformen torsdag 14. november kl. 22–24. Modulus Barn er utilgjengelig i dette tidsrommet.\n\nLagre arbeidet ditt før kl. 22. Kommuneportalen er tilgjengelig som vanlig.',
 			published: true,
-			authorId: admin,
-			publishedAt: daysAgo(10)
+			authorId: u.admin,
+			publishedAt: daysAgo(3)
 		},
 		{
 			kind: 'news',
-			title: 'Planlagt vedlikehold 14. november',
-			slug: 'planlagt-vedlikehold-14-november',
-			excerpt: 'Systemet er utilgjengelig kl. 22–24 på grunn av oppgradering.',
-			body: 'Vi oppgraderer driftsplattformen. Lagre arbeidet ditt før kl. 22.',
+			title: 'Modulus Barn er nå i bruk i 157 kommuner',
+			slug: 'modulus-barn-157-kommuner',
+			excerpt:
+				'Løsningen fra DigiBarnevern er på vei til å bli nasjonal standard, med over 160 kommuner i løpet av 2026.',
+			body: 'DigiBarnevern ble startet i 2016 av Bufdir, KS og åtte av landets største kommuner. I dag bruker 157 kommuner Modulus Barn, og over 3000 barnevernsansatte jobber i løsningen.\n\nI løpet av 2026 passerer vi 160 kommuner, som til sammen dekker mer enn halvparten av befolkningen. Takk til alle som deler erfaringer og ønsker. Det er dere som former veien videre.',
 			published: true,
-			authorId: admin,
-			publishedAt: daysAgo(5)
+			authorId: u.admin,
+			publishedAt: daysAgo(6)
+		},
+		{
+			kind: 'release',
+			title: 'Nye maler i BFK for undersøkelsesfasen',
+			slug: 'nye-maler-bfk-undersokelse',
+			excerpt:
+				'Oppdaterte maler for undersøkelsesplan og konklusjon, utarbeidet sammen med kommunene.',
+			body: 'Malene for undersøkelsesplan og konklusjon i BFK er oppdatert etter innspill fra kommunene i forumet. De nye malene er tilgjengelige for alle fra i dag.',
+			published: true,
+			authorId: u.admin,
+			publishedAt: daysAgo(9)
+		},
+		{
+			kind: 'news',
+			title: 'Prioriteringsmøte for videreutvikling 2027',
+			slug: 'prioriteringsmote-2027',
+			excerpt:
+				'Kommunene bestemmer i fellesskap hva som skal utvikles videre. Legg inn ønskene deres i forumet før 1. desember.',
+			body: 'I desember møtes kommunene for å prioritere videreutviklingen av Modulus Barn for 2027.\n\nLegg inn ønsker og forslag i forumet under «Ønsker til videreutvikling» før 1. desember. Støtt gjerne forslag fra andre kommuner med et svar.',
+			ctaLabel: 'Gå til ønskene',
+			ctaUrl: '/forum?kategori=onsker-til-videreutvikling',
+			published: true,
+			authorId: u.admin,
+			publishedAt: daysAgo(12)
 		},
 		{
 			kind: 'news',
@@ -442,46 +560,59 @@ async function main() {
 			excerpt: 'Hjelp oss å bli bedre.',
 			body: 'Utkast – ikke publisert.',
 			published: false,
-			authorId: admin
+			authorId: u.admin
 		}
 	]);
 
 	await db.insert(s.cartItem).values([
 		{
 			municipalityId: k.Bergen,
-			productId: p['mobil-saksbehandling'].id,
+			productId: p['mobil-arbeidsflate'].id,
 			quantity: 1,
-			addedById: kari
+			addedById: u.kari
 		},
 		{
 			municipalityId: k.Bergen,
-			productId: p['kurs-grunnopplaering'].id,
+			productId: p.grunnkurs.id,
 			quantity: 6,
 			note: 'Nye saksbehandlere fra januar',
-			addedById: kari
+			addedById: u.kari
 		}
 	]);
 
 	const requests = [
 		{
 			municipalityId: k['Tromsø'],
-			submittedById: ola,
+			submittedById: u.ola,
 			status: 'new' as const,
 			message: 'Ønsker tilbud på superbrukerkurs for to personer i februar.',
 			items: [[p.superbrukerkurs, 2]] as const,
-			age: 1
+			age: 1,
+			adminNote: ''
 		},
 		{
 			municipalityId: k.Trondheim,
-			submittedById: sara,
+			submittedById: u.sara,
 			status: 'answered' as const,
-			message: 'Vi vurderer rapporteringsmodulen.',
+			message: 'Vi vurderer styringsdata til ledergruppen.',
 			items: [
-				[p['innsikt-og-rapportering'], 1],
-				[p['utvidet-support'], 1]
+				[p['utvidet-styringsdata'], 1],
+				[p['utvidet-brukerstotte'], 1]
 			] as const,
 			age: 8,
-			adminNote: 'Tilbud sendt på e-post.'
+			adminNote: 'Tilbud er sendt på e-post.'
+		},
+		{
+			municipalityId: k['Bodø'],
+			submittedById: u.jonas,
+			status: 'in_progress' as const,
+			message: 'Vi starter i januar og trenger hjelp med innføring og migrering.',
+			items: [
+				[p.innforingspakke, 1],
+				[p.datamigrering, 1]
+			] as const,
+			age: 5,
+			adminNote: ''
 		}
 	];
 	for (const r of requests) {
@@ -492,7 +623,7 @@ async function main() {
 				submittedById: r.submittedById,
 				status: r.status,
 				message: r.message,
-				adminNote: r.adminNote ?? '',
+				adminNote: r.adminNote,
 				createdAt: daysAgo(r.age)
 			})
 			.returning();

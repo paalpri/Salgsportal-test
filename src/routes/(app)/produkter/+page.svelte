@@ -16,11 +16,11 @@
 	const activeChip = 'bg-primary text-primary-foreground hover:bg-primary';
 </script>
 
-<svelte:head><title>Produkter · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Moduler og tjenester · Modulus Barn</title></svelte:head>
 
 <PageHeader
-	title="Produkter"
-	description="Moduler, integrasjoner, kurs og tjenester til barnevernssystemet."
+	title="Moduler og tjenester"
+	description="Utvid Modulus Barn med nye moduler, integrasjoner, kurs og hjelp til innføring. Legg det dere trenger i handlelisten, så tar vi kontakt."
 />
 
 <div class="mb-6 space-y-4">
@@ -29,7 +29,7 @@
 		<Search
 			class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
 		/>
-		<Input name="q" value={data.query} placeholder="Søk etter produkter …" class="pl-9" />
+		<Input name="q" value={data.query} placeholder="Søk i moduler og tjenester …" class="pl-9" />
 	</form>
 	<nav class="flex gap-2 overflow-x-auto pb-1" aria-label="Kategorier">
 		<a href="/produkter" class={cn(chip, !data.active && !data.onlyNew && activeChip)}>Alle</a>
@@ -55,7 +55,7 @@
 	<Empty.Root class="border">
 		<Empty.Header>
 			<Empty.Media variant="icon"><Package /></Empty.Media>
-			<Empty.Title>Ingen produkter funnet</Empty.Title>
+			<Empty.Title>Fant ingenting</Empty.Title>
 			<Empty.Description>Prøv et annet søk eller en annen kategori.</Empty.Description>
 		</Empty.Header>
 	</Empty.Root>

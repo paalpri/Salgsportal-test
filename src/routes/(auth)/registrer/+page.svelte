@@ -16,7 +16,7 @@
 	const values = $derived((form?.values ?? {}) as Record<string, string>);
 </script>
 
-<svelte:head><title>Opprett konto · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Opprett konto · Modulus Barn</title></svelte:head>
 
 <form
 	method="post"
@@ -31,7 +31,7 @@
 	<Field.Group class="gap-6">
 		<div class="space-y-2">
 			<h1 class="text-3xl font-normal">Opprett konto</h1>
-			<p class="text-muted-foreground">For ansatte i kommuner som bruker barnevernssystemet.</p>
+			<p class="text-muted-foreground">For ansatte i kommuner som bruker Modulus Barn.</p>
 		</div>
 		{#if form?.message && !Object.keys(errors).length}
 			<Alert.Root variant="destructive">

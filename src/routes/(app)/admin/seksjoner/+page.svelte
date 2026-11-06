@@ -20,11 +20,11 @@
 	}
 </script>
 
-<svelte:head><title>Moduler · Admin</title></svelte:head>
+<svelte:head><title>Seksjoner · Admin</title></svelte:head>
 
 <PageHeader
-	title="Moduler"
-	description="Slå deler av portalen av eller på for alle kommunebrukere."
+	title="Seksjoner"
+	description="Slå deler av portalen av eller på for alle kommunebrukere. Administratorer ser alltid alt."
 />
 
 <form
@@ -60,9 +60,9 @@
 
 <Alert.Root class="mt-6">
 	<Info />
-	<Alert.Title>Legge til en ny modul?</Alert.Title>
+	<Alert.Title>Trenger dere en ny seksjon?</Alert.Title>
 	<Alert.Description>
-		Nye moduler registreres i <code>src/lib/modules.ts</code> med egen rutemappe. De dukker da opp i menyen
-		og her automatisk.
+		Nye seksjoner legges til av utviklingsteamet. De dukker da automatisk opp i menyen og i denne
+		listen.
 	</Alert.Description>
 </Alert.Root>

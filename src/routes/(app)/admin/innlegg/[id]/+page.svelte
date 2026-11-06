@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { withToast } from '#lib/forms.ts';
+	import { postKinds, postKindKeys, type PostKind } from '#lib/post-kinds.ts';
 	import PageHeader from '#lib/components/app/page-header.svelte';
 	import ConfirmDelete from '#lib/components/app/confirm-delete.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -21,8 +22,7 @@
 	const v = (key: keyof NonNullable<typeof data.post>) => values[key] ?? String(post?.[key] ?? '');
 
 	// svelte-ignore state_referenced_locally
-	let kind = $state<string>(data.post?.kind ?? 'news');
-	const kinds = { news: 'Nyhet', ad: 'Kampanje / annonse' } as const;
+	let kind = $state<PostKind>(data.post?.kind ?? 'release');
 </script>
 
 <svelte:head><title>{post ? post.title : 'Nytt innlegg'} · Admin</title></svelte:head>
@@ -58,16 +58,15 @@
 						<Field.Field>
 							<Field.Label for="kind">Type</Field.Label>
 							<Select.Root type="single" name="kind" bind:value={kind}>
-								<Select.Trigger id="kind" class="w-full"
-									>{kinds[kind as keyof typeof kinds]}</Select.Trigger
-								>
+								<Select.Trigger id="kind" class="w-full">{postKinds[kind].label}</Select.Trigger>
 								<Select.Content>
-									<Select.Item value="news" label={kinds.news} />
-									<Select.Item value="ad" label={kinds.ad} />
+									{#each postKindKeys as key (key)}
+										<Select.Item value={key} label={postKinds[key].label} />
+									{/each}
 								</Select.Content>
 							</Select.Root>
 							<Field.Description>
-								{kind === 'ad' ? 'Vises som banner på forsiden.' : 'Vises i nyhetsoversikten.'}
+								{postKinds[kind].description}
 							</Field.Description>
 						</Field.Field>
 						<Field.Field data-invalid={!!errors.slug}>

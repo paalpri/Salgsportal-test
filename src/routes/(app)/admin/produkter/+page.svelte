@@ -11,9 +11,12 @@
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>Produkter · Admin</title></svelte:head>
+<svelte:head><title>Moduler og priser · Admin</title></svelte:head>
 
-<PageHeader title="Produkter" description="Produktkatalogen som kommunene ser.">
+<PageHeader
+	title="Moduler og priser"
+	description="Katalogen kommunene ser under «Moduler og tjenester». Bare administratorer kan endre produkter og priser."
+>
 	{#snippet actions()}
 		<Button href="/admin/produkter/kategorier" variant="outline"><Tags /> Kategorier</Button>
 		<Button href="/admin/produkter/ny"><Plus /> Nytt produkt</Button>

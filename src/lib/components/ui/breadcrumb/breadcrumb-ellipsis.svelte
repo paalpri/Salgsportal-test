@@ -19,5 +19,5 @@
 	{...restProps}
 >
 	<MoreHorizontalIcon />
-	<span class="sr-only">More</span>
+	<span class="sr-only">Flere</span>
 </span>

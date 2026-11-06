@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { withToast } from '#lib/forms.ts';
-	import type { Welcome } from '#lib/site-content.ts';
+	import { KEY_FIGURE_SLOTS, type Welcome } from '#lib/site-content.ts';
 	import PageHeader from '#lib/components/app/page-header.svelte';
 	import WelcomeHero from '#lib/components/app/welcome-hero.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -16,7 +16,10 @@
 	let { data, form }: PageProps = $props();
 	// A fresh editable copy whenever the saved content changes (after save or reset).
 	const draft = $derived.by(() => {
-		const copy = $state<Welcome>({ ...data.welcome });
+		const figures = Array.from({ length: KEY_FIGURE_SLOTS }, (_, i) => ({
+			...(data.welcome.figures[i] ?? { value: '', label: '' })
+		}));
+		const copy = $state<Welcome>({ ...data.welcome, figures });
 		return copy;
 	});
 	const errors = $derived((form && 'errors' in form ? form.errors : {}) as Record<string, string>);
@@ -113,6 +116,33 @@
 							{#if errors.secondaryUrl}<Field.Error>{errors.secondaryUrl}</Field.Error>{/if}
 						</Field.Field>
 					</div>
+					<Field.Set>
+						<Field.Legend variant="label">Nøkkeltall</Field.Legend>
+						<Field.Description>
+							Vises nederst i velkomstseksjonen. Tomme rader skjules. Oppdater tallene når flere
+							kommuner tar i bruk løsningen.
+						</Field.Description>
+						<div class="grid gap-3">
+							{#each draft.figures as figure, i (i)}
+								<div class="grid gap-3 sm:grid-cols-[10rem_1fr]">
+									<Input
+										name="figure{i}Value"
+										bind:value={figure.value}
+										placeholder="F.eks. 157"
+										maxlength={20}
+										aria-label="Nøkkeltall {i + 1}, tall"
+									/>
+									<Input
+										name="figure{i}Label"
+										bind:value={figure.label}
+										placeholder="F.eks. kommuner bruker Modulus Barn"
+										maxlength={80}
+										aria-label="Nøkkeltall {i + 1}, tekst"
+									/>
+								</div>
+							{/each}
+						</div>
+					</Field.Set>
 					<Field.Field data-invalid={!!errors.imageUrl}>
 						<Field.Label for="imageUrl">Bilde-URL</Field.Label>
 						<Input

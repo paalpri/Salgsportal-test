@@ -1,29 +1,53 @@
 <script lang="ts">
-	import { modules } from '#lib/modules.ts';
-	import { formatDate } from '#lib/format.ts';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import WelcomeHero from '#lib/components/app/welcome-hero.svelte';
 	import SectionHeader from '#lib/components/app/section-header.svelte';
 	import ThreadList from '#lib/components/app/thread-list.svelte';
 	import ProductCard from '#lib/components/app/product-card.svelte';
+	import PostCard from '#lib/components/app/post-card.svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	const firstName = $derived(data.user.name.split(' ')[0]);
-	const shortcuts = $derived(modules.filter((m) => data.modules.includes(m.key)));
 	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
+	const ideas = '/forum?kategori=onsker-til-videreutvikling';
 </script>
 
-<svelte:head><title>Hjem · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Hjem · Modulus Barn</title></svelte:head>
 
 <div class="space-y-12 md:space-y-16">
-	<WelcomeHero
-		welcome={data.welcome}
-		greeting="Hei, {firstName}"
-		editHref={data.user.isAdmin ? '/admin/forside' : undefined}
-	/>
+	<div class="space-y-4">
+		{#if data.notice}
+			<a
+				href="/nyheter/{data.notice.slug}"
+				class="group flex items-start gap-4 rounded-lg bg-card p-5 shadow-[inset_4px_0_0_var(--coral)] md:items-center md:px-6"
+			>
+				<TriangleAlert class="mt-0.5 size-5 shrink-0 text-coral md:mt-0" />
+				<div class="min-w-0 flex-1">
+					<p class="text-sm">
+						<span class="font-semibold">Driftsmelding:</span>
+						<span class="group-hover:underline group-hover:underline-offset-4"
+							>{data.notice.title}</span
+						>
+					</p>
+					<p class="text-sm text-muted-foreground">{data.notice.excerpt}</p>
+				</div>
+				<span class="hidden shrink-0 items-center gap-1.5 text-sm font-semibold md:inline-flex">
+					Les mer <ArrowRight class="size-4" />
+				</span>
+			</a>
+		{/if}
+
+		<WelcomeHero
+			welcome={data.welcome}
+			greeting="Hei, {firstName}"
+			editHref={data.user.isAdmin ? '/admin/forside' : undefined}
+		/>
+	</div>
 
 	{#if data.campaign}
 		{@const c = data.campaign}
@@ -43,71 +67,55 @@
 						>{c.ctaLabel ?? 'Les mer'} <ArrowRight /></Button
 					>
 				{/if}
-				<Button href="/nyheter/{c.slug}" size="lg" variant="ghost" class="h-11 px-4"
-					>Detaljer</Button
+				<Button href="/nyheter/{c.slug}" size="lg" variant="ghost" class="h-11 px-4">Les mer</Button
 				>
 			</div>
 		</section>
 	{/if}
 
-	{#if shortcuts.length}
+	{#if data.updates.length}
 		<section>
-			<SectionHeader title="I portalen" />
-			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-				{#each shortcuts as m (m.key)}
-					<a href={m.href} class="card-link group flex flex-col gap-4 rounded-lg bg-card p-6">
-						<m.icon class="size-8" strokeWidth={1.5} />
-						<div class="space-y-1.5">
-							<h3 class="text-lg font-medium">{m.label}</h3>
-							<p class="text-sm text-muted-foreground">{m.description}</p>
-						</div>
-						<span class="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold">
-							Gå til {m.label.toLowerCase()}
-							<ArrowRight class="size-4 transition-transform group-hover:translate-x-0.5" />
-						</span>
-					</a>
+			<SectionHeader title="Nytt i Modulus Barn" href="/nyheter" linkLabel="Alle nyheter" />
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				{#each data.updates as post (post.id)}
+					<PostCard {post} />
 				{/each}
 			</div>
 		</section>
 	{/if}
 
-	{#if data.threads.length || data.news.length}
+	{#if data.modules.includes('forum')}
 		<div class="grid gap-12 lg:grid-cols-3 lg:gap-8">
-			{#if data.threads.length}
-				<section class={data.news.length ? 'lg:col-span-2' : 'lg:col-span-3'}>
-					<SectionHeader title="Siste fra forumet" href="/forum" linkLabel="Til forumet" />
+			<section class="lg:col-span-2">
+				<SectionHeader title="Siste fra forumet" href="/forum" linkLabel="Til forumet" />
+				{#if data.threads.length}
 					<ThreadList threads={data.threads} />
-				</section>
-			{/if}
-			{#if data.news.length}
-				<section class={data.threads.length ? '' : 'lg:col-span-3'}>
-					<SectionHeader title="Nyheter" href="/nyheter" linkLabel="Alle nyheter" />
-					<ul class="divide-y overflow-hidden rounded-lg bg-card">
-						{#each data.news as post (post.id)}
-							<li>
-								<a
-									href="/nyheter/{post.slug}"
-									class="group block space-y-1 px-5 py-4 hover:bg-muted md:px-6"
-								>
-									{#if post.publishedAt}
-										<time class="text-xs text-muted-foreground">{formatDate(post.publishedAt)}</time
-										>
-									{/if}
-									<p class="font-medium group-hover:underline group-hover:underline-offset-4">
-										{post.title}
-									</p>
-								</a>
-							</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
+				{:else}
+					<p class="rounded-lg bg-card p-6 text-sm text-muted-foreground">
+						Ingen innlegg ennå. Bli den første!
+					</p>
+				{/if}
+			</section>
+			<aside class="flex flex-col gap-4 rounded-lg bg-card p-6 md:p-8 lg:mt-12">
+				<Lightbulb class="size-8" strokeWidth={1.5} />
+				<h2 class="text-xl font-normal">Dere former Modulus Barn</h2>
+				<p class="text-sm text-muted-foreground">
+					Kommunene bestemmer i fellesskap hvordan løsningen skal utvikles videre. Har dere et ønske
+					eller en idé? Legg det inn, og støtt gjerne forslagene fra andre kommuner.
+				</p>
+				<div class="mt-auto flex flex-col gap-2 pt-2">
+					<Button href="/forum/ny?kategori=onsker-til-videreutvikling" class="w-full"
+						>Foreslå en forbedring</Button
+					>
+					<Button href={ideas} variant="ghost" class="w-full">Se ønskene fra andre kommuner</Button>
+				</div>
+			</aside>
 		</div>
 	{/if}
 
 	{#if data.products.length}
 		<section>
-			<SectionHeader title="Nye produkter" href="/produkter" linkLabel="Se alle produkter" />
+			<SectionHeader title="Nye moduler og tjenester" href="/produkter" linkLabel="Se alt" />
 			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{#each data.products as product (product.id)}
 					<ProductCard {product} inCart={data.inCart.includes(product.id)} {canOrder} />

@@ -75,7 +75,7 @@ export const forumReply = pgTable(
 	(t) => [index().on(t.threadId, t.createdAt)]
 );
 
-export const postKind = pgEnum('post_kind', ['news', 'ad']);
+export const postKind = pgEnum('post_kind', ['news', 'release', 'ops', 'ad']);
 
 export const post = pgTable(
 	'post',

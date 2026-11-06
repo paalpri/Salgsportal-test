@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PageHeader from '#lib/components/app/page-header.svelte';
+	import PostKindTag from '#lib/components/app/post-kind-tag.svelte';
 	import { formatDate } from '#lib/format.ts';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -11,11 +12,11 @@
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>Nyheter og annonser · Admin</title></svelte:head>
+<svelte:head><title>Nyheter og kampanjer · Admin</title></svelte:head>
 
 <PageHeader
-	title="Nyheter og annonser"
-	description="Kampanjer vises som banner på forsiden. Nyheter vises i nyhetsoversikten."
+	title="Nyheter og kampanjer"
+	description="Endringer i løsningen, nyheter, driftsmeldinger og kampanjer. Velg type for å styre hvor innlegget vises."
 >
 	{#snippet actions()}
 		<Button href="/admin/innlegg/ny"><Plus /> Nytt innlegg</Button>
@@ -43,9 +44,7 @@
 							{#if p.pinned}<Pin class="size-3.5 text-coral" />{/if}{p.title}
 						</a>
 					</Table.Cell>
-					<Table.Cell
-						><Badge variant="outline">{p.kind === 'ad' ? 'Kampanje' : 'Nyhet'}</Badge></Table.Cell
-					>
+					<Table.Cell><PostKindTag kind={p.kind} /></Table.Cell>
 					<Table.Cell>
 						{#if p.published}<Badge variant="secondary">Publisert</Badge>{:else}<Badge
 								variant="outline">Utkast</Badge

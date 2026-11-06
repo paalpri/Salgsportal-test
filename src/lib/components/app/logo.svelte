@@ -17,7 +17,7 @@
 	{#if showName}
 		<span class="grid leading-tight">
 			<span class="truncate text-[15px] font-medium tracking-tight">{site.name}</span>
-			<span class="truncate text-xs opacity-70">levert av Netcompany</span>
+			<span class="truncate text-xs opacity-70">Kommuneportalen</span>
 		</span>
 	{/if}
 </span>

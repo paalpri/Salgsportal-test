@@ -30,12 +30,17 @@
 			href: '/admin/kommuner'
 		},
 		{ label: 'Forumtråder', value: data.stats.threads, icon: MessagesSquare, href: '/forum' },
-		{ label: 'Produkter', value: data.stats.products, icon: Package, href: '/admin/produkter' },
+		{
+			label: 'Moduler og tjenester',
+			value: data.stats.products,
+			icon: Package,
+			href: '/admin/produkter'
+		},
 		{ label: 'Innlegg', value: data.stats.posts, icon: FileText, href: '/admin/innlegg' }
 	]);
 </script>
 
-<svelte:head><title>Administrasjon · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Administrasjon · Modulus Barn</title></svelte:head>
 
 <PageHeader title="Administrasjon" description="Oversikt over portalen.">
 	{#snippet actions()}

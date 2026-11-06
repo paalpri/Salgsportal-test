@@ -14,9 +14,12 @@
 	const newHref = $derived(data.active ? `/forum/ny?kategori=${data.active.slug}` : '/forum/ny');
 </script>
 
-<svelte:head><title>Forum · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Forum · Modulus Barn</title></svelte:head>
 
-<PageHeader title="Forum" description="Still spørsmål, del erfaringer og hjelp andre kommuner.">
+<PageHeader
+	title="Forum"
+	description="For dere som bruker og forvalter Modulus Barn. Spør om bruk, del rutiner og fortell hva som fungerer – og hva som ikke gjør det."
+>
 	{#snippet actions()}
 		<Button href={newHref}><Plus /> Nytt innlegg</Button>
 	{/snippet}

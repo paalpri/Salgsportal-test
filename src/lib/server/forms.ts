@@ -1,6 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { z } from 'zod';
 
+z.config(z.locales.no());
+
 export const text = (max = 200) =>
 	z.string().trim().min(1, 'Må fylles ut').max(max, `Maks ${max} tegn`);
 

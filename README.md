@@ -1,10 +1,13 @@
-# Kommuneportalen
+# Kommuneportalen for Modulus Barn
 
-Customer portal for kommuner that use the barnevern system. Kommune staff sign in to read news and
-campaigns, help each other in a forum, browse products and collect them in a shared shopping list that
-they send to us as a quote request. Admins manage all content from `/admin`.
+Customer and community portal for the kommuner that use Modulus Barn, the barnevern solution from
+the DigiBarnevern project, delivered by Netcompany. It is not the case-management system itself: it is
+where the people who use and manage Modulus Barn follow what has changed (release notes, news,
+driftsmeldinger), see and order new modules, courses and services through a shared shopping list, and
+help each other in a forum, including requests for further development, which the kommuner prioritise
+together. Netcompany admins manage all content from `/admin`.
 
-The UI is in Norwegian (bokmål); code and docs are in English.
+All text on the site is Norwegian (bokmål), including validation messages (zod `no` locale). Code and docs are in English.
 
 ## Stack
 
@@ -90,8 +93,12 @@ register themselves at `/registrer`; if the kommune has an email domain set, the
 it. Sign-up through the better-auth HTTP API is disabled so this check can't be skipped. Admins can
 create users, move them between kommuner, change roles and ban them (banning ends their sessions).
 
+**News types.** Posts are an Endring (release notes), Nyhet, Driftsmelding or Kampanje (`src/lib/post-kinds.ts`).
+The newest driftsmelding from the last 14 days is shown as a notice at the top of the front page, and the
+newest kampanje as a banner.
+
 **Front page.** The welcome section at the top of `/` is the same for everyone and only admins can
-change it, in `/admin/forside` (with live preview). It is stored in `site_content` as one JSON document
+change it, in `/admin/forside` (with live preview), including the key figures (kommuner, users). It is stored in `site_content` as one JSON document
 per section; `readContent(key, defaults)` merges stored fields over code defaults, so more editable
 sections can be added the same way. Members can only write forum posts and edit their kommune's
 shopping list; products, prices, news and campaigns are admin-only.
@@ -102,7 +109,7 @@ reply in `/admin/foresporsler`; the kommune sees both on its shopping list page.
 
 ## Extending
 
-**A new feature module** (own menu item, can be switched off in `/admin/moduler`):
+**A new feature module** (own menu item, can be switched off in `/admin/seksjoner`):
 
 1. Add an entry to `src/lib/modules.ts` (`key`, `label`, `description`, `href`, `icon`).
 2. Create `src/routes/(app)/<href>/` with its pages.

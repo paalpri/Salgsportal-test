@@ -31,7 +31,9 @@ test('registration enforces the kommune email domain', async ({ page }) => {
 	await page.getByLabel('Passord').fill('Passord123!');
 	await page.getByRole('button', { name: 'Opprett konto' }).click();
 	await expect(page).toHaveURL('/');
-	await expect(page.getByRole('heading', { name: 'Velkommen til Kommuneportalen' })).toBeVisible();
+	await expect(
+		page.getByRole('heading', { name: 'Kommuneportalen for Modulus Barn' })
+	).toBeVisible();
 	await expect(page.getByText('Hei, Test')).toBeVisible();
 });
 
@@ -44,7 +46,7 @@ test('members can start a thread, get a reply and mark it as the solution', asyn
 	await open(page, '/forum');
 	await page.getByRole('link', { name: 'Nytt innlegg' }).first().click();
 	await page.waitForLoadState('networkidle');
-	await pick(page, 'Kategori', 'Spørsmål og svar');
+	await pick(page, 'Kategori', 'Bruk og arbeidsflyt');
 	await page.getByLabel('Tittel').fill(title);
 	await page.getByLabel('Innhold').fill('Vi trenger tall per kvartal.');
 	await page.getByRole('button', { name: 'Publiser' }).click();
@@ -107,7 +109,7 @@ test('admin publishes a campaign that members see on the dashboard', async ({ pa
 	const title = unique('Vinterkampanje');
 	await login(page, ADMIN);
 	await open(page, '/admin/innlegg/ny');
-	await pick(page, 'Type', 'Kampanje / annonse');
+	await pick(page, 'Type', 'Kampanje');
 	await page.getByLabel('Tittel').fill(title);
 	await page.getByLabel('Ingress').fill('Halv pris på kurs i januar.');
 	await page.getByLabel('Knappelenke').fill('/produkter');
@@ -129,7 +131,7 @@ test('admin publishes a campaign that members see on the dashboard', async ({ pa
 
 test('admin can switch a module off for members', async ({ page, browser }) => {
 	await login(page, ADMIN);
-	await open(page, '/admin/moduler');
+	await open(page, '/admin/seksjoner');
 	const forumSwitch = page.getByRole('switch', { name: /Forum/ });
 	await forumSwitch.click();
 	await expect(forumSwitch).not.toBeChecked();
@@ -192,5 +194,13 @@ test('admin edits the welcome section that every member sees', async ({ page, br
 	await member.close();
 
 	await page.getByRole('button', { name: 'Gjenopprett standardtekst' }).click();
-	await expect(page.getByLabel('Overskrift')).toHaveValue('Velkommen til Kommuneportalen');
+	await expect(page.getByLabel('Overskrift')).toHaveValue('Kommuneportalen for Modulus Barn');
+});
+
+test('front page shows the current driftsmelding and key figures', async ({ page }) => {
+	await login(page, MEMBER);
+	await expect(page.getByText('Driftsmelding:')).toBeVisible();
+	await expect(page.getByRole('link', { name: /Planlagt vedlikehold/ })).toBeVisible();
+	await expect(page.getByText('kommuner bruker Modulus Barn')).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Nytt i Modulus Barn' })).toBeVisible();
 });

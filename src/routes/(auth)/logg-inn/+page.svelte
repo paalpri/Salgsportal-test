@@ -18,7 +18,7 @@
 	});
 </script>
 
-<svelte:head><title>Logg inn · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Logg inn · Modulus Barn</title></svelte:head>
 
 <form
 	method="post"

@@ -12,7 +12,7 @@
 	const errors = $derived((form && 'errors' in form ? form.errors : {}) as Record<string, string>);
 </script>
 
-<svelte:head><title>Min profil · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Min profil · Modulus Barn</title></svelte:head>
 
 <div class="mx-auto max-w-2xl space-y-6">
 	<PageHeader title="Min profil" />

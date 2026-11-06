@@ -11,19 +11,19 @@
 
 	const highlights = [
 		{
-			icon: MessagesSquare,
-			title: 'Hjelp hverandre',
-			text: 'Del erfaringer og løsninger med andre kommuner.'
-		},
-		{
 			icon: Newspaper,
-			title: 'Hold dere oppdatert',
-			text: 'Nyheter, driftsmeldinger og endringer i systemet.'
+			title: 'Nytt i løsningen',
+			text: 'Endringer, nye versjoner og driftsmeldinger for Modulus Barn.'
 		},
 		{
 			icon: Package,
-			title: 'Bestill enkelt',
-			text: 'Moduler, kurs og tjenester i én felles handleliste.'
+			title: 'Moduler og tjenester',
+			text: 'Se hva som er nytt, og samle bestillingen i kommunens handleliste.'
+		},
+		{
+			icon: MessagesSquare,
+			title: 'Erfaringer fra andre kommuner',
+			text: 'Spør, svar og bidra til hvordan løsningen utvikles videre.'
 		}
 	];
 	const demo = $derived(
@@ -39,7 +39,9 @@
 		<div class="flex flex-1 items-center justify-center py-12">
 			<div class="w-full max-w-sm">{@render children()}</div>
 		</div>
-		<p class="text-xs text-muted-foreground">Kommuneportalen er levert og driftet av Netcompany.</p>
+		<p class="text-xs text-muted-foreground">
+			Kommuneportalen for Modulus Barn er levert og driftet av Netcompany.
+		</p>
 	</div>
 
 	<aside
@@ -50,9 +52,9 @@
 			class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.07)_1px,transparent_1px)] bg-[size:25%_33.333%]"
 		></div>
 		<div class="relative max-w-xl space-y-5">
-			<p class="text-sm text-white/70">Barnevernssystemet for kommunene</p>
+			<p class="text-sm text-white/70">DigiBarnevern · Modulus Barn</p>
 			<h2 class="text-4xl leading-[1.1] font-normal xl:text-5xl">
-				Fellesskap, nyheter og innkjøp, samlet på ett sted.
+				Møteplassen for kommunene som bruker Modulus Barn.
 			</h2>
 		</div>
 		<div class="relative max-w-xl">

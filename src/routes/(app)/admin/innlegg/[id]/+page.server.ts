@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, ne } from 'drizzle-orm';
 import { z } from 'zod';
+import { postKindKeys, type PostKind } from '#lib/post-kinds.ts';
 import { currentUser } from '#lib/server/auth.ts';
 import { uniqueSlug } from '#lib/server/admin.ts';
 import { db } from '#lib/server/db/index.ts';
@@ -28,7 +29,7 @@ async function findPost(id: string) {
 export const load: PageServerLoad = async ({ params }) => ({ post: await findPost(params.id) });
 
 const schema = z.object({
-	kind: z.enum(['news', 'ad']),
+	kind: z.enum(postKindKeys as [PostKind, ...PostKind[]]),
 	title: text(150),
 	slug: optionalText(150),
 	excerpt: longText(300),

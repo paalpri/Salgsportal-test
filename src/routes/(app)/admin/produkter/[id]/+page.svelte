@@ -30,7 +30,7 @@
 
 <div class="mx-auto max-w-3xl">
 	<Button href="/admin/produkter" variant="ghost" size="sm" class="mb-2 -ml-2"
-		><ArrowLeft /> Alle produkter</Button
+		><ArrowLeft /> Moduler og priser</Button
 	>
 	<PageHeader title={product ? 'Rediger produkt' : 'Nytt produkt'}>
 		{#snippet actions()}

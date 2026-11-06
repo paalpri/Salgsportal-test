@@ -18,12 +18,12 @@
 	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
 </script>
 
-<svelte:head><title>{p.name} · Produkter</title></svelte:head>
+<svelte:head><title>{p.name} · Modulus Barn</title></svelte:head>
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<Button href="/produkter" variant="ghost" size="sm" class="-ml-2"
-			><ArrowLeft /> Alle produkter</Button
+			><ArrowLeft /> Alle moduler og tjenester</Button
 		>
 		{#if data.user.isAdmin}
 			<Button href="/admin/produkter/{p.id}" variant="outline" size="sm"><Pencil /> Rediger</Button>

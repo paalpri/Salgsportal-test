@@ -46,9 +46,11 @@
 		<footer
 			class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 pb-8 text-xs text-muted-foreground md:px-10"
 		>
-			<span>Kommuneportalen · levert og driftet av Netcompany</span>
+			<span>Kommuneportalen for Modulus Barn · levert og driftet av Netcompany</span>
 			{#if data.modules.includes('forum')}
-				<a href="/forum" class="hover:text-foreground">Trenger du hjelp? Spør i forumet</a>
+				<a href="/forum" class="hover:text-foreground"
+					>Står du fast? Spør andre kommuner i forumet</a
+				>
 			{/if}
 		</footer>
 	</Sidebar.Inset>

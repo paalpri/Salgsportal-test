@@ -11,7 +11,7 @@
 <svelte:head><title>Produktkategorier · Admin</title></svelte:head>
 
 <Button href="/admin/produkter" variant="ghost" size="sm" class="mb-2 -ml-2"
-	><ArrowLeft /> Produkter</Button
+	><ArrowLeft /> Moduler og priser</Button
 >
 <PageHeader title="Produktkategorier" description="Brukes til å filtrere produktkatalogen." />
 

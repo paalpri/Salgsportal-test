@@ -6,6 +6,7 @@
 
 	type Props = { welcome: Welcome; greeting?: string; editHref?: string };
 	let { welcome, greeting, editHref }: Props = $props();
+	const figures = $derived((welcome.figures ?? []).filter((f) => f.value.trim()));
 </script>
 
 <section class="relative overflow-hidden rounded-lg bg-brand text-brand-foreground">
@@ -60,6 +61,18 @@
 			<img src={welcome.imageUrl} alt="" class="aspect-[4/3] w-full rounded-md object-cover" />
 		{/if}
 	</div>
+	{#if figures.length}
+		<dl
+			class="relative grid grid-cols-2 gap-px border-t border-white/15 bg-white/15 md:grid-cols-4"
+		>
+			{#each figures as figure, i (i)}
+				<div class="flex flex-col gap-1 bg-brand px-8 py-6 md:px-12">
+					<dt class="order-2 text-sm text-white/70">{figure.label}</dt>
+					<dd class="text-3xl font-normal tracking-tight md:text-4xl">{figure.value}</dd>
+				</div>
+			{/each}
+		</dl>
+	{/if}
 	{#if editHref}
 		<a
 			href={editHref}

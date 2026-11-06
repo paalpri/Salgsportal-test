@@ -13,5 +13,5 @@
 </svelte:head>
 
 <ModeWatcher />
-<Toaster richColors position="top-right" />
+<Toaster richColors position="top-right" containerAriaLabel="Varsler" />
 {@render children()}

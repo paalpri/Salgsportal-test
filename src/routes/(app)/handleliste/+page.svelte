@@ -27,7 +27,7 @@
 	const submitOnChange = (e: Event) => (e.currentTarget as HTMLInputElement).form?.requestSubmit();
 </script>
 
-<svelte:head><title>Handleliste · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Handleliste · Modulus Barn</title></svelte:head>
 
 <PageHeader
 	title="Handleliste"
@@ -130,10 +130,10 @@
 						<Empty.Media variant="icon"><ShoppingCart /></Empty.Media>
 						<Empty.Title>Handlelisten er tom</Empty.Title>
 						<Empty.Description
-							>Legg til moduler, kurs eller tjenester fra produktkatalogen.</Empty.Description
+							>Legg til moduler, kurs eller tjenester fra katalogen.</Empty.Description
 						>
 					</Empty.Header>
-					<Empty.Content><Button href="/produkter">Se produkter</Button></Empty.Content>
+					<Empty.Content><Button href="/produkter">Se moduler og tjenester</Button></Empty.Content>
 				</Empty.Root>
 			{/if}
 		</div>

@@ -32,13 +32,13 @@
 	const adminLinks = [
 		{ href: '/admin', label: 'Oversikt', icon: LayoutDashboard },
 		{ href: '/admin/forside', label: 'Forside', icon: PanelsTopLeft },
-		{ href: '/admin/innlegg', label: 'Nyheter og annonser', icon: FileText },
-		{ href: '/admin/produkter', label: 'Produkter og priser', icon: Package },
+		{ href: '/admin/innlegg', label: 'Nyheter og kampanjer', icon: FileText },
+		{ href: '/admin/produkter', label: 'Moduler og priser', icon: Package },
 		{ href: '/admin/forum', label: 'Forumkategorier', icon: MessagesSquare },
 		{ href: '/admin/foresporsler', label: 'Forespørsler', icon: Inbox },
 		{ href: '/admin/brukere', label: 'Brukere', icon: Users },
 		{ href: '/admin/kommuner', label: 'Kommuner', icon: Landmark },
-		{ href: '/admin/moduler', label: 'Moduler', icon: Blocks }
+		{ href: '/admin/seksjoner', label: 'Seksjoner', icon: Blocks }
 	];
 
 	const visibleModules = $derived(modules.filter((m) => enabled.includes(m.key)));

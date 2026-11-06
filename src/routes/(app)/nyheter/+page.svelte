@@ -1,28 +1,33 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { postKinds, postKindKeys } from '#lib/post-kinds.ts';
 	import PageHeader from '#lib/components/app/page-header.svelte';
 	import PostCard from '#lib/components/app/post-card.svelte';
 	import * as Tabs from '#lib/components/ui/tabs/index.js';
 	import * as Empty from '#lib/components/ui/empty/index.js';
-	import { goto } from '$app/navigation';
 	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>Nyheter · Kommuneportalen</title></svelte:head>
+<svelte:head><title>Nyheter · Modulus Barn</title></svelte:head>
 
-<PageHeader title="Nyheter" description="Nyheter, kampanjer og kunngjøringer." />
+<PageHeader
+	title="Nyheter"
+	description="Hva som er endret i Modulus Barn, nyheter fra DigiBarnevern, driftsmeldinger og kampanjer."
+/>
 
 <Tabs.Root
 	value={data.kind}
 	onValueChange={(v) => goto(v === 'all' ? '/nyheter' : `?type=${v}`)}
-	class="mb-6"
+	class="mb-8"
 >
-	<Tabs.List>
+	<Tabs.List class="h-auto flex-wrap justify-start">
 		<Tabs.Trigger value="all">Alle</Tabs.Trigger>
-		<Tabs.Trigger value="news">Nyheter</Tabs.Trigger>
-		<Tabs.Trigger value="ad">Kampanjer</Tabs.Trigger>
+		{#each postKindKeys as key (key)}
+			<Tabs.Trigger value={key}>{postKinds[key].plural}</Tabs.Trigger>
+		{/each}
 	</Tabs.List>
 </Tabs.Root>
 
@@ -33,11 +38,13 @@
 		{/each}
 	</div>
 {:else}
-	<Empty.Root class="border">
+	<Empty.Root class="rounded-lg bg-card">
 		<Empty.Header>
 			<Empty.Media variant="icon"><Newspaper /></Empty.Media>
-			<Empty.Title>Ingen innlegg ennå</Empty.Title>
-			<Empty.Description>Nye nyheter og kampanjer dukker opp her.</Empty.Description>
+			<Empty.Title>Ingenting her ennå</Empty.Title>
+			<Empty.Description
+				>Nye endringer, nyheter og driftsmeldinger dukker opp her.</Empty.Description
+			>
 		</Empty.Header>
 	</Empty.Root>
 {/if}

@@ -1,4 +1,5 @@
 export const site = {
-	name: 'Kommuneportalen',
-	tagline: 'Fellesskap, nyheter og innkjøp for kommuner som bruker barnevernssystemet'
+	name: 'Modulus Barn',
+	portal: 'Kommuneportalen for Modulus Barn',
+	tagline: 'Nyheter, moduler og erfaringsdeling for kommunene som bruker Modulus Barn'
 };

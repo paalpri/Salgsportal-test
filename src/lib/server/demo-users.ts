@@ -10,7 +10,7 @@ export const demoUsers = [
 		email: 'admin@kommuneportalen.no',
 		name: 'Ingrid Solberg',
 		label: 'Administrator',
-		description: 'Netcompany. Redigerer forside, produkter, priser og innlegg.'
+		description: 'Netcompany. Redigerer forside, moduler, priser og nyheter.'
 	},
 	{
 		key: 'leder',
@@ -24,14 +24,14 @@ export const demoUsers = [
 		email: 'ola.hansen@tromso.kommune.no',
 		name: 'Ola Hansen',
 		label: 'Saksbehandler',
-		description: 'Tromsø kommune. Aktiv i forumet.'
+		description: 'Tromsø kommune. Spør og svarer i forumet.'
 	},
 	{
 		key: 'systemansvarlig',
 		email: 'jonas.lie@bodo.kommune.no',
 		name: 'Jonas Lie',
-		label: 'Systemansvarlig',
-		description: 'Bodø kommune. Integrasjoner og oppsett.'
+		label: 'Fagsystemansvarlig',
+		description: 'Bodø kommune. Starter med Modulus Barn i januar.'
 	}
 ] as const;
 
