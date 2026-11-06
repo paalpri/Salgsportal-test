@@ -33,13 +33,18 @@ Demo users (password `Passord123!`, development only):
 
 | User                              | Role                    |
 | --------------------------------- | ----------------------- |
-| `admin@kommuneportalen.no`        | Admin                   |
+| `admin@kommuneportalen.no`        | Admin (Netcompany)      |
 | `kari.nordmann@bergen.kommune.no` | Kommune user, Bergen    |
 | `ola.hansen@tromso.kommune.no`    | Kommune user, Tromsø    |
 | `sara.berg@trondheim.kommune.no`  | Kommune user, Trondheim |
 | `jonas.lie@bodo.kommune.no`       | Kommune user, Bodø      |
 
 `pnpm db:reset` wipes the database volume and re-runs migrations and seed.
+
+**Test logins.** While testing, `/logg-inn` shows four test users (admin, barnevernleder,
+saksbehandler, systemansvarlig). Clicking one fills in the form. The panel is always on in `pnpm dev`;
+a production build only shows it with `DEMO_LOGIN=true`. Never set that in production, and remove
+`src/lib/server/demo-users.ts` and the picker when the portal goes live.
 
 ## Scripts
 
@@ -85,6 +90,12 @@ register themselves at `/registrer`; if the kommune has an email domain set, the
 it. Sign-up through the better-auth HTTP API is disabled so this check can't be skipped. Admins can
 create users, move them between kommuner, change roles and ban them (banning ends their sessions).
 
+**Front page.** The welcome section at the top of `/` is the same for everyone and only admins can
+change it, in `/admin/forside` (with live preview). It is stored in `site_content` as one JSON document
+per section; `readContent(key, defaults)` merges stored fields over code defaults, so more editable
+sections can be added the same way. Members can only write forum posts and edit their kommune's
+shopping list; products, prices, news and campaigns are admin-only.
+
 **Shopping list and requests.** The list is shared by everyone in a kommune. Sending it creates a
 quote request with a copy of product names and prices, and empties the list. Admins set a status and
 reply in `/admin/foresporsler`; the kommune sees both on its shopping list page.
@@ -105,6 +116,15 @@ then in the page's `+page.server.ts` export `actions = crudActions(table, zodSch
 `<InlineEditor fields={…} rows={…} />`. See `src/routes/(app)/admin/kommuner/`.
 
 **A new UI component** from shadcn-svelte: `pnpm dlx shadcn-svelte@latest add <name>`.
+
+## Design
+
+The look follows netcompany.com: ink `#141e1e`, deep green `#123836`, grey-green canvas `#e7ecec`
+and a single coral accent `#ff6359` (hover frames, focus rings, tags), with square corners and
+regular-weight headlines. All colors are shadcn tokens in `src/routes/layout.css`; the `.card-link`
+class gives clickable cards the coral hover frame. Netcompany's own typeface is proprietary, so the app
+uses Instrument Sans as a stand-in; swap `--font-sans` if the brand font is licensed for this product.
+The logo is a placeholder mark in the Netcompany palette, not the official Netcompany logo.
 
 ## Deployment notes
 

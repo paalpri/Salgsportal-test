@@ -3,6 +3,7 @@ import {
 	boolean,
 	index,
 	integer,
+	jsonb,
 	pgEnum,
 	pgTable,
 	text,
@@ -171,6 +172,13 @@ export const quoteRequestItem = pgTable('quote_request_item', {
 	priceUnit: text(),
 	quantity: integer().notNull(),
 	note: text().notNull().default('')
+});
+
+/** Admin-edited page content, one JSON document per section (see #lib/site-content.ts). */
+export const siteContent = pgTable('site_content', {
+	key: text().primaryKey(),
+	data: jsonb().notNull(),
+	updatedAt: updatedAt()
 });
 
 export const moduleSetting = pgTable('module_setting', {

@@ -50,7 +50,7 @@
 	<div class="grid gap-6 lg:grid-cols-[1fr_320px]">
 		<div>
 			{#if data.items.length}
-				<div class="overflow-hidden rounded-xl border bg-card">
+				<div class="overflow-hidden rounded-lg bg-card">
 					<Table.Root>
 						<Table.Header>
 							<Table.Row>
@@ -154,7 +154,7 @@
 				>
 					<div class="flex items-baseline justify-between">
 						<span class="text-sm text-muted-foreground">Estimert sum</span>
-						<span class="text-lg font-semibold">{formatPrice(total)}</span>
+						<span class="text-2xl font-normal tabular-nums">{formatPrice(total)}</span>
 					</div>
 					{#if hasUnpriced}<p class="text-xs text-muted-foreground">
 							+ produkter med pris på forespørsel
@@ -165,7 +165,7 @@
 						placeholder="Melding til oss (valgfritt)"
 						maxlength={2000}
 					/>
-					<Button type="submit" class="w-full" disabled={!orderable.length}
+					<Button type="submit" size="lg" class="h-11 w-full" disabled={!orderable.length}
 						><Send /> Send forespørsel</Button
 					>
 				</form>
@@ -174,18 +174,23 @@
 	</div>
 
 	{#if data.requests.length}
-		<section class="mt-10 space-y-4">
-			<h2 class="text-lg font-semibold">Tidligere forespørsler</h2>
-			<ul class="divide-y rounded-xl border bg-card">
+		<section class="mt-12 md:mt-16">
+			<h2 class="mb-5 text-xl font-normal md:text-2xl">Tidligere forespørsler</h2>
+			<ul class="divide-y overflow-hidden rounded-lg bg-card">
 				{#each data.requests as r (r.id)}
-					<li class="flex flex-col gap-1 p-4 sm:flex-row sm:items-start sm:justify-between">
+					<li class="flex flex-col gap-3 p-5 sm:flex-row sm:items-start sm:justify-between md:p-6">
 						<div class="space-y-1">
 							<p class="font-medium">Forespørsel #{r.id} · {r.itemCount} produkter</p>
 							<p class="text-sm text-muted-foreground">
 								{formatDate(r.createdAt)}{r.submittedBy ? ` · ${r.submittedBy}` : ''}
 							</p>
 							{#if r.message}<p class="text-sm">«{r.message}»</p>{/if}
-							{#if r.adminNote}<p class="text-sm text-primary">Svar: {r.adminNote}</p>{/if}
+							{#if r.adminNote}
+								<p class="mt-2 rounded-sm bg-muted px-3 py-2 text-sm">
+									<span class="font-medium">Svar fra Netcompany:</span>
+									{r.adminNote}
+								</p>
+							{/if}
 						</div>
 						<Badge variant={quoteStatuses[r.status].variant} class="w-fit"
 							>{quoteStatuses[r.status].label}</Badge

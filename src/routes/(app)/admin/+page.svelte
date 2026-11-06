@@ -61,11 +61,11 @@
 
 <section class="mt-10 space-y-4">
 	<div class="flex items-center justify-between">
-		<h2 class="text-lg font-semibold">Siste forespørsler</h2>
+		<h2 class="text-xl font-normal md:text-2xl">Siste forespørsler</h2>
 		<Button href="/admin/foresporsler" variant="ghost" size="sm">Se alle</Button>
 	</div>
 	{#if data.recent.length}
-		<ul class="divide-y rounded-xl border bg-card">
+		<ul class="divide-y rounded-lg bg-card">
 			{#each data.recent as r (r.id)}
 				<li>
 					<a

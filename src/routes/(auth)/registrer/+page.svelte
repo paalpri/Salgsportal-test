@@ -28,12 +28,10 @@
 		};
 	}}
 >
-	<Field.Group>
-		<div class="flex flex-col gap-1">
-			<h1 class="text-2xl font-semibold tracking-tight">Opprett konto</h1>
-			<p class="text-sm text-muted-foreground">
-				For ansatte i kommuner som bruker barnevernssystemet.
-			</p>
+	<Field.Group class="gap-6">
+		<div class="space-y-2">
+			<h1 class="text-3xl font-normal">Opprett konto</h1>
+			<p class="text-muted-foreground">For ansatte i kommuner som bruker barnevernssystemet.</p>
 		</div>
 		{#if form?.message && !Object.keys(errors).length}
 			<Alert.Root variant="destructive">
@@ -91,13 +89,13 @@
 			<Field.Description>Minst 8 tegn.</Field.Description>
 			{#if errors.password}<Field.Error>{errors.password}</Field.Error>{/if}
 		</Field.Field>
-		<Button type="submit" class="w-full" disabled={pending}>
+		<Button type="submit" size="lg" class="h-11 w-full" disabled={pending}>
 			{pending ? 'Oppretter …' : 'Opprett konto'}
 		</Button>
 		<Field.Description class="text-center">
 			Har du allerede konto? <a
 				href="/logg-inn{page.url.search}"
-				class="underline underline-offset-4">Logg inn</a
+				class="font-medium text-foreground underline underline-offset-4">Logg inn</a
 			>
 		</Field.Description>
 	</Field.Group>

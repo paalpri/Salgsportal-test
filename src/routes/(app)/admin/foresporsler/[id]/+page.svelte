@@ -40,7 +40,7 @@
 
 <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
 	<div class="space-y-6">
-		<div class="overflow-hidden rounded-xl border bg-card">
+		<div class="overflow-hidden rounded-lg bg-card">
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
@@ -94,7 +94,7 @@
 						</p>{/if}
 					<a
 						href="mailto:{data.submittedBy.email}"
-						class="inline-flex items-center gap-1 text-primary hover:underline"
+						class="inline-flex items-center gap-1.5 font-medium underline-offset-4 hover:underline"
 						><Mail class="size-3.5" /> {data.submittedBy.email}</a
 					>
 				{:else}

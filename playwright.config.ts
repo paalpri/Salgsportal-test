@@ -19,7 +19,11 @@ export default defineConfig({
 	webServer: {
 		command: `pnpm build && pnpm preview --port ${port} --strictPort`,
 		port,
-		env: { ORIGIN: `http://localhost:${port}`, DATABASE_URL: testDatabase.href },
+		env: {
+			ORIGIN: `http://localhost:${port}`,
+			DATABASE_URL: testDatabase.href,
+			DEMO_LOGIN: 'true'
+		},
 		reuseExistingServer: false
 	}
 });

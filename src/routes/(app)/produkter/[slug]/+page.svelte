@@ -32,14 +32,12 @@
 
 	<div class="grid gap-8 lg:grid-cols-[1fr_340px]">
 		<div class="space-y-6">
-			<div class="aspect-[16/9] overflow-hidden rounded-2xl bg-muted">
+			<div class="aspect-[16/9] overflow-hidden rounded-lg bg-card">
 				{#if p.imageUrl}
 					<img src={p.imageUrl} alt="" class="size-full object-cover" />
 				{:else}
-					<div
-						class="flex size-full items-center justify-center bg-gradient-to-br from-primary/15 via-primary/5 to-transparent"
-					>
-						<Package class="size-16 text-primary/50" />
+					<div class="flex size-full items-center justify-center">
+						<Package class="size-16 text-muted-foreground/50" strokeWidth={1} />
 					</div>
 				{/if}
 			</div>
@@ -50,10 +48,10 @@
 							><Badge variant="outline">{data.category.name}</Badge></a
 						>
 					{/if}
-					{#if p.isNew}<Badge>Nyhet</Badge>{/if}
+					{#if p.isNew}<Badge class="bg-coral text-ink">Nyhet</Badge>{/if}
 					{#if !p.active}<Badge variant="destructive">Skjult</Badge>{/if}
 				</div>
-				<h1 class="text-3xl font-semibold tracking-tight">{p.name}</h1>
+				<h1 class="text-3xl font-normal md:text-4xl">{p.name}</h1>
 				<p class="text-lg text-muted-foreground">{p.summary}</p>
 			</div>
 			<div class="leading-7 whitespace-pre-line">{p.description}</div>

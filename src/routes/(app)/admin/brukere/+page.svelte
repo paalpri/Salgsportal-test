@@ -63,7 +63,7 @@
 	<Input name="q" value={data.query} placeholder="Søk på navn eller e-post …" class="pl-9" />
 </form>
 
-<div class="overflow-hidden rounded-xl border bg-card">
+<div class="overflow-hidden rounded-lg bg-card">
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
@@ -82,8 +82,8 @@
 					</Table.Cell>
 					<Table.Cell class="hidden md:table-cell">{u.municipalityName ?? '–'}</Table.Cell>
 					<Table.Cell class="space-x-1">
-						{#if u.role === 'admin'}<Badge>Admin</Badge>{:else}<Badge variant="outline"
-								>Kommune</Badge
+						{#if u.role === 'admin'}<Badge class="bg-brand text-white">Admin</Badge>{:else}<Badge
+								variant="outline">Kommune</Badge
 							>{/if}
 						{#if u.banned}<Badge variant="destructive">Sperret</Badge>{/if}
 					</Table.Cell>

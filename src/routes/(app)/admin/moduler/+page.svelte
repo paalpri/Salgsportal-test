@@ -37,11 +37,11 @@
 	<input type="hidden" name="enabled" value={pending.enabled ? 'on' : 'off'} />
 </form>
 
-<div class="divide-y rounded-xl border bg-card">
+<div class="divide-y rounded-lg bg-card">
 	{#each modules as m (m.key)}
 		<div class="flex items-center gap-4 p-4">
 			<span
-				class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+				class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground"
 			>
 				<m.icon class="size-5" />
 			</span>

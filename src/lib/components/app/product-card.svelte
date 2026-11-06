@@ -2,9 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { withToast } from '#lib/forms.ts';
 	import { formatPrice } from '#lib/format.ts';
-	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
-	import * as Card from '#lib/components/ui/card/index.js';
 	import Package from '@lucide/svelte/icons/package';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Check from '@lucide/svelte/icons/check';
@@ -27,47 +25,50 @@
 	let { product, inCart = false, canOrder = true }: Props = $props();
 </script>
 
-<Card.Root class="group flex flex-col overflow-hidden pt-0">
-	<a href="/produkter/{product.slug}" class="relative block aspect-[16/9] overflow-hidden bg-muted">
-		{#if product.imageUrl}
-			<img
-				src={product.imageUrl}
-				alt=""
-				class="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-			/>
-		{:else}
-			<div
-				class="flex size-full items-center justify-center bg-gradient-to-br from-primary/15 via-primary/5 to-transparent"
-			>
-				<Package class="size-10 text-primary/60" />
-			</div>
-		{/if}
-		{#if product.isNew}<Badge class="absolute top-3 left-3">Nyhet</Badge>{/if}
-	</a>
-	<Card.Header>
+<article class="card-link group flex flex-col overflow-hidden rounded-lg bg-card">
+	{#if product.imageUrl}
+		<a
+			href="/produkter/{product.slug}"
+			class="block aspect-[16/9] overflow-hidden bg-muted"
+			tabindex="-1"
+		>
+			<img src={product.imageUrl} alt="" class="size-full object-cover" />
+		</a>
+	{/if}
+	<div class="flex flex-1 flex-col gap-2 p-6">
+		<div class="mb-2 flex min-h-6 items-start justify-between gap-3">
+			{#if !product.imageUrl}<Package class="size-8" strokeWidth={1.5} />{/if}
+			{#if product.isNew}
+				<span class="ml-auto rounded-sm bg-coral px-2 py-0.5 text-xs font-semibold text-ink"
+					>Nyhet</span
+				>
+			{/if}
+		</div>
 		{#if product.categoryName}
 			<p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">
 				{product.categoryName}
 			</p>
 		{/if}
-		<Card.Title
-			><a href="/produkter/{product.slug}" class="hover:underline">{product.name}</a></Card.Title
-		>
-		<Card.Description class="line-clamp-2">{product.summary}</Card.Description>
-	</Card.Header>
-	<Card.Footer class="mt-auto flex items-center justify-between gap-2">
-		<span class="text-sm font-medium">{formatPrice(product.priceNok, product.priceUnit)}</span>
-		{#if canOrder && inCart}
-			<Button href="/handleliste" size="sm" variant="secondary"><Check /> I listen</Button>
-		{:else if canOrder}
-			<form
-				method="post"
-				action="/produkter?/addToCart"
-				use:enhance={withToast('Lagt til i handlelisten')}
+		<h3 class="text-lg leading-snug font-medium">
+			<a href="/produkter/{product.slug}" class="underline-offset-4 hover:underline"
+				>{product.name}</a
 			>
-				<input type="hidden" name="productId" value={product.id} />
-				<Button type="submit" size="sm"><Plus /> Legg til</Button>
-			</form>
-		{/if}
-	</Card.Footer>
-</Card.Root>
+		</h3>
+		<p class="line-clamp-2 text-sm text-muted-foreground">{product.summary}</p>
+		<div class="mt-auto flex items-center justify-between gap-3 pt-4">
+			<span class="text-sm font-semibold">{formatPrice(product.priceNok, product.priceUnit)}</span>
+			{#if canOrder && inCart}
+				<Button href="/handleliste" size="sm" variant="secondary"><Check /> I listen</Button>
+			{:else if canOrder}
+				<form
+					method="post"
+					action="/produkter?/addToCart"
+					use:enhance={withToast('Lagt til i handlelisten')}
+				>
+					<input type="hidden" name="productId" value={product.id} />
+					<Button type="submit" size="sm"><Plus /> Legg til</Button>
+				</form>
+			{/if}
+		</div>
+	</div>
+</article>

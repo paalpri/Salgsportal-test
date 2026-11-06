@@ -8,5 +8,10 @@ export const variables = defineEnvVars({
 	BETTER_AUTH_SECRET: {
 		description:
 			'Secret used to sign tokens. For production use 32 characters generated with high entropy. See [Better Auth installation](https://www.better-auth.com/docs/installation).'
+	},
+	DEMO_LOGIN: {
+		description:
+			'`true` shows one-click test users on the login page in a production build. Always on in `vite dev`. Never enable in production.',
+		schema: (value) => value === 'true'
 	}
 });

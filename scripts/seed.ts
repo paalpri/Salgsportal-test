@@ -44,11 +44,11 @@ async function main() {
 	const password = await hashPassword(DEMO_PASSWORD);
 	const people = [
 		{
-			name: 'Ingrid Admin',
+			name: 'Ingrid Solberg',
 			email: 'admin@kommuneportalen.no',
 			role: 'admin',
 			municipalityId: null,
-			jobTitle: 'Kundeansvarlig'
+			jobTitle: 'Kundeansvarlig, Netcompany'
 		},
 		{
 			name: 'Kari Nordmann',

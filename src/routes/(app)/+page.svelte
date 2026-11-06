@@ -1,114 +1,116 @@
 <script lang="ts">
 	import { modules } from '#lib/modules.ts';
+	import { formatDate } from '#lib/format.ts';
 	import { Button } from '#lib/components/ui/button/index.js';
-	import { Badge } from '#lib/components/ui/badge/index.js';
+	import WelcomeHero from '#lib/components/app/welcome-hero.svelte';
+	import SectionHeader from '#lib/components/app/section-header.svelte';
 	import ThreadList from '#lib/components/app/thread-list.svelte';
 	import ProductCard from '#lib/components/app/product-card.svelte';
-	import PostCard from '#lib/components/app/post-card.svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
-	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	const firstName = $derived(data.user.name.split(' ')[0]);
-	const [hero, ...otherAds] = $derived(data.ads);
 	const shortcuts = $derived(modules.filter((m) => data.modules.includes(m.key)));
 	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
 </script>
 
 <svelte:head><title>Hjem · Kommuneportalen</title></svelte:head>
 
-<div class="space-y-10">
-	<section class="space-y-1">
-		<h1 class="text-2xl font-semibold tracking-tight md:text-3xl">Hei, {firstName} 👋</h1>
-		<p class="text-muted-foreground">
-			{data.user.municipalityName
-				? `Velkommen tilbake til portalen for ${data.user.municipalityName}.`
-				: 'Velkommen tilbake.'}
-		</p>
-	</section>
+<div class="space-y-12 md:space-y-16">
+	<WelcomeHero
+		welcome={data.welcome}
+		greeting="Hei, {firstName}"
+		editHref={data.user.isAdmin ? '/admin/forside' : undefined}
+	/>
 
-	{#if hero}
-		<section class="relative overflow-hidden rounded-2xl bg-brand p-6 text-white md:p-10">
-			<div
-				class="pointer-events-none absolute -right-16 -bottom-24 size-80 rounded-full bg-white/10 blur-2xl"
-			></div>
-			<div class="relative max-w-2xl space-y-4">
-				<Badge variant="secondary" class="gap-1"><Megaphone class="size-3" /> Kampanje</Badge>
-				<h2 class="text-2xl font-semibold tracking-tight md:text-3xl">{hero.title}</h2>
-				<p class="text-white/85">{hero.excerpt}</p>
-				<div class="flex flex-wrap gap-2">
-					{#if hero.ctaUrl}
-						<Button href={hero.ctaUrl} variant="secondary">
-							{hero.ctaLabel ?? 'Les mer'}
-							<ArrowRight />
-						</Button>
-					{/if}
-					<Button
-						href="/nyheter/{hero.slug}"
-						variant="ghost"
-						class="text-white hover:bg-white/10 hover:text-white"
-					>
-						Detaljer
-					</Button>
-				</div>
-			</div>
-		</section>
-	{/if}
-
-	<section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-		{#each shortcuts as m (m.key)}
-			<a
-				href={m.href}
-				class="group flex items-start gap-3 rounded-xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-primary/5"
-			>
-				<span
-					class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+	{#if data.campaign}
+		{@const c = data.campaign}
+		<section
+			class="flex flex-col gap-5 rounded-lg bg-card p-6 md:flex-row md:items-center md:justify-between md:p-8"
+		>
+			<div class="max-w-2xl space-y-2">
+				<span class="inline-block rounded-sm bg-coral px-1.5 py-0.5 text-xs font-semibold text-ink"
+					>Kampanje</span
 				>
-					<m.icon class="size-5" />
-				</span>
-				<span class="space-y-0.5">
-					<span class="block font-medium">{m.label}</span>
-					<span class="block text-sm text-muted-foreground">{m.description}</span>
-				</span>
-			</a>
-		{/each}
-	</section>
-
-	{#if data.threads.length}
-		<section class="space-y-4">
-			<div class="flex items-center justify-between">
-				<h2 class="text-lg font-semibold">Siste fra forumet</h2>
-				<Button href="/forum" variant="ghost" size="sm">Til forumet <ArrowRight /></Button>
+				<h2 class="text-xl font-normal md:text-2xl">{c.title}</h2>
+				<p class="text-muted-foreground">{c.excerpt}</p>
 			</div>
-			<ThreadList threads={data.threads} />
+			<div class="flex shrink-0 flex-wrap gap-2">
+				{#if c.ctaUrl}
+					<Button href={c.ctaUrl} size="lg" class="h-11 px-4"
+						>{c.ctaLabel ?? 'Les mer'} <ArrowRight /></Button
+					>
+				{/if}
+				<Button href="/nyheter/{c.slug}" size="lg" variant="ghost" class="h-11 px-4"
+					>Detaljer</Button
+				>
+			</div>
 		</section>
 	{/if}
 
-	{#if data.products.length}
-		<section class="space-y-4">
-			<div class="flex items-center justify-between">
-				<h2 class="text-lg font-semibold">Nye produkter</h2>
-				<Button href="/produkter" variant="ghost" size="sm">Se alle <ArrowRight /></Button>
-			</div>
-			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{#each data.products as product (product.id)}
-					<ProductCard {product} inCart={data.inCart.includes(product.id)} {canOrder} />
+	{#if shortcuts.length}
+		<section>
+			<SectionHeader title="I portalen" />
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				{#each shortcuts as m (m.key)}
+					<a href={m.href} class="card-link group flex flex-col gap-4 rounded-lg bg-card p-6">
+						<m.icon class="size-8" strokeWidth={1.5} />
+						<div class="space-y-1.5">
+							<h3 class="text-lg font-medium">{m.label}</h3>
+							<p class="text-sm text-muted-foreground">{m.description}</p>
+						</div>
+						<span class="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold">
+							Gå til {m.label.toLowerCase()}
+							<ArrowRight class="size-4 transition-transform group-hover:translate-x-0.5" />
+						</span>
+					</a>
 				{/each}
 			</div>
 		</section>
 	{/if}
 
-	{#if data.news.length || otherAds.length}
-		<section class="space-y-4">
-			<div class="flex items-center justify-between">
-				<h2 class="text-lg font-semibold">Nyheter</h2>
-				<Button href="/nyheter" variant="ghost" size="sm">Alle nyheter <ArrowRight /></Button>
-			</div>
+	{#if data.threads.length || data.news.length}
+		<div class="grid gap-12 lg:grid-cols-3 lg:gap-8">
+			{#if data.threads.length}
+				<section class={data.news.length ? 'lg:col-span-2' : 'lg:col-span-3'}>
+					<SectionHeader title="Siste fra forumet" href="/forum" linkLabel="Til forumet" />
+					<ThreadList threads={data.threads} />
+				</section>
+			{/if}
+			{#if data.news.length}
+				<section class={data.threads.length ? '' : 'lg:col-span-3'}>
+					<SectionHeader title="Nyheter" href="/nyheter" linkLabel="Alle nyheter" />
+					<ul class="divide-y overflow-hidden rounded-lg bg-card">
+						{#each data.news as post (post.id)}
+							<li>
+								<a
+									href="/nyheter/{post.slug}"
+									class="group block space-y-1 px-5 py-4 hover:bg-muted md:px-6"
+								>
+									{#if post.publishedAt}
+										<time class="text-xs text-muted-foreground">{formatDate(post.publishedAt)}</time
+										>
+									{/if}
+									<p class="font-medium group-hover:underline group-hover:underline-offset-4">
+										{post.title}
+									</p>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+		</div>
+	{/if}
+
+	{#if data.products.length}
+		<section>
+			<SectionHeader title="Nye produkter" href="/produkter" linkLabel="Se alle produkter" />
 			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{#each [...otherAds, ...data.news].slice(0, 3) as post (post.id)}
-					<PostCard {post} />
+				{#each data.products as product (product.id)}
+					<ProductCard {product} inCart={data.inCart.includes(product.id)} {canOrder} />
 				{/each}
 			</div>
 		</section>

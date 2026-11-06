@@ -46,18 +46,15 @@
 </script>
 
 <div
-	class={cn(
-		'rounded-xl border bg-card p-4 md:p-5',
-		highlight && 'border-emerald-500/50 bg-emerald-500/5'
-	)}
+	class={cn('rounded-lg bg-card p-5 md:p-6', highlight && 'shadow-[inset_4px_0_0_var(--success)]')}
 >
 	<div class="flex items-start gap-3">
-		<Avatar.Root class="size-9">
+		<Avatar.Root class="size-10 rounded-sm">
 			<Avatar.Fallback
 				class={cn(
 					author?.role === 'admin'
-						? 'bg-primary text-primary-foreground'
-						: 'bg-primary/10 text-primary'
+						? 'rounded-sm bg-brand text-white'
+						: 'rounded-sm bg-secondary text-secondary-foreground'
 				)}
 			>
 				{author?.name ? initials(author.name) : '?'}
@@ -66,7 +63,7 @@
 		<div class="min-w-0 flex-1">
 			<div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
 				<span class="font-medium">{author?.name ?? 'Slettet bruker'}</span>
-				{#if author?.role === 'admin'}<Badge variant="secondary">Leverandør</Badge>{/if}
+				{#if author?.role === 'admin'}<Badge class="bg-brand text-white">Netcompany</Badge>{/if}
 				{@render badge?.()}
 			</div>
 			<p class="text-xs text-muted-foreground">
@@ -93,14 +90,14 @@
 				<input type="hidden" {name} {value} />
 			{/each}
 			{#if title !== undefined}<Input name="title" value={title} maxlength={150} required />{/if}
-			<Textarea name="body" value={body} rows={6} required />
+			<Textarea name="body" value={body} class="min-h-32" required />
 			<div class="flex justify-end gap-2">
 				<Button type="button" variant="ghost" onclick={() => (editing = false)}>Avbryt</Button>
 				<Button type="submit">Lagre</Button>
 			</div>
 		</form>
 	{:else}
-		<div class="mt-3 leading-7 break-words whitespace-pre-line md:pl-12">{body}</div>
-		{#if actions}<div class="mt-3 flex flex-wrap gap-1 md:pl-12">{@render actions()}</div>{/if}
+		<div class="mt-3 leading-7 break-words whitespace-pre-line md:pl-13">{body}</div>
+		{#if actions}<div class="mt-3 flex flex-wrap gap-1 md:pl-13">{@render actions()}</div>{/if}
 	{/if}
 </div>

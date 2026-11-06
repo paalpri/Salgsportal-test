@@ -5,10 +5,10 @@
 	import Logo from './logo.svelte';
 	import * as Sidebar from '#lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
-	import * as Avatar from '#lib/components/ui/avatar/index.js';
 	import { toggleMode, mode } from 'mode-watcher';
 	import House from '@lucide/svelte/icons/house';
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
+	import PanelsTopLeft from '@lucide/svelte/icons/panels-top-left';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Package from '@lucide/svelte/icons/package';
 	import MessagesSquare from '@lucide/svelte/icons/messages-square';
@@ -31,8 +31,9 @@
 
 	const adminLinks = [
 		{ href: '/admin', label: 'Oversikt', icon: LayoutDashboard },
+		{ href: '/admin/forside', label: 'Forside', icon: PanelsTopLeft },
 		{ href: '/admin/innlegg', label: 'Nyheter og annonser', icon: FileText },
-		{ href: '/admin/produkter', label: 'Produkter', icon: Package },
+		{ href: '/admin/produkter', label: 'Produkter og priser', icon: Package },
 		{ href: '/admin/forum', label: 'Forumkategorier', icon: MessagesSquare },
 		{ href: '/admin/foresporsler', label: 'Forespørsler', icon: Inbox },
 		{ href: '/admin/brukere', label: 'Brukere', icon: Users },
@@ -46,42 +47,44 @@
 			? page.url.pathname === href
 			: page.url.pathname === href || page.url.pathname.startsWith(href + '/');
 
+	const item = 'h-9 data-active:shadow-[inset_3px_0_0_var(--coral)]';
 	let logoutForm: HTMLFormElement;
 </script>
 
+{#snippet link(href: string, label: string, Icon: typeof House)}
+	<Sidebar.MenuButton isActive={isActive(href)} tooltipContent={label} class={item}>
+		{#snippet child({ props })}
+			<a {href} {...props}><Icon /><span>{label}</span></a>
+		{/snippet}
+	</Sidebar.MenuButton>
+{/snippet}
+
 <Sidebar.Root collapsible="icon">
-	<Sidebar.Header>
+	<Sidebar.Header class="px-3 pt-4 pb-2">
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
-				<Sidebar.MenuButton size="lg">
+				<Sidebar.MenuButton size="lg" class="hover:bg-transparent active:bg-transparent">
 					{#snippet child({ props })}
-						<a href="/" {...props}><Logo /></a>
+						<a href="/" {...props}><Logo inverted class="text-white" /></a>
 					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Header>
 
-	<Sidebar.Content>
+	<Sidebar.Content class="px-1">
 		<Sidebar.Group>
-			<Sidebar.GroupLabel>{user.municipalityName ?? 'Portal'}</Sidebar.GroupLabel>
+			<Sidebar.GroupLabel class="text-sidebar-foreground/60">
+				{user.municipalityName ? `${user.municipalityName} kommune` : 'Portal'}
+			</Sidebar.GroupLabel>
 			<Sidebar.Menu>
-				<Sidebar.MenuItem>
-					<Sidebar.MenuButton isActive={isActive('/')} tooltipContent="Hjem">
-						{#snippet child({ props })}
-							<a href="/" {...props}><House /><span>Hjem</span></a>
-						{/snippet}
-					</Sidebar.MenuButton>
-				</Sidebar.MenuItem>
+				<Sidebar.MenuItem>{@render link('/', 'Hjem', House)}</Sidebar.MenuItem>
 				{#each visibleModules as m (m.key)}
 					<Sidebar.MenuItem>
-						<Sidebar.MenuButton isActive={isActive(m.href)} tooltipContent={m.label}>
-							{#snippet child({ props })}
-								<a href={m.href} {...props}><m.icon /><span>{m.label}</span></a>
-							{/snippet}
-						</Sidebar.MenuButton>
+						{@render link(m.href, m.label, m.icon)}
 						{#if m.key === 'cart' && cartCount > 0}
-							<Sidebar.MenuBadge>{cartCount}</Sidebar.MenuBadge>
+							<Sidebar.MenuBadge class="rounded-sm bg-coral text-ink">{cartCount}</Sidebar.MenuBadge
+							>
 						{/if}
 					</Sidebar.MenuItem>
 				{/each}
@@ -90,23 +93,17 @@
 
 		{#if user.isAdmin}
 			<Sidebar.Group>
-				<Sidebar.GroupLabel>Administrasjon</Sidebar.GroupLabel>
+				<Sidebar.GroupLabel class="text-sidebar-foreground/60">Administrasjon</Sidebar.GroupLabel>
 				<Sidebar.Menu>
-					{#each adminLinks as link (link.href)}
-						<Sidebar.MenuItem>
-							<Sidebar.MenuButton isActive={isActive(link.href)} tooltipContent={link.label}>
-								{#snippet child({ props })}
-									<a href={link.href} {...props}><link.icon /><span>{link.label}</span></a>
-								{/snippet}
-							</Sidebar.MenuButton>
-						</Sidebar.MenuItem>
+					{#each adminLinks as l (l.href)}
+						<Sidebar.MenuItem>{@render link(l.href, l.label, l.icon)}</Sidebar.MenuItem>
 					{/each}
 				</Sidebar.Menu>
 			</Sidebar.Group>
 		{/if}
 	</Sidebar.Content>
 
-	<Sidebar.Footer>
+	<Sidebar.Footer class="border-t border-sidebar-border p-3">
 		<form method="post" action="/logg-ut" bind:this={logoutForm} class="hidden"></form>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
@@ -114,20 +111,20 @@
 					<DropdownMenu.Trigger>
 						{#snippet child({ props })}
 							<Sidebar.MenuButton size="lg" {...props}>
-								<Avatar.Root class="size-8 rounded-lg">
-									<Avatar.Fallback class="rounded-lg bg-primary/10 text-primary">
-										{initials(user.name)}
-									</Avatar.Fallback>
-								</Avatar.Root>
+								<span
+									class="flex size-8 shrink-0 items-center justify-center rounded-sm bg-white/10 text-xs font-semibold text-white"
+								>
+									{initials(user.name)}
+								</span>
 								<div class="grid flex-1 text-left text-sm leading-tight">
-									<span class="truncate font-medium">{user.name}</span>
-									<span class="truncate text-xs text-muted-foreground">{user.email}</span>
+									<span class="truncate font-medium text-white">{user.name}</span>
+									<span class="truncate text-xs text-sidebar-foreground/60">{user.email}</span>
 								</div>
 								<ChevronsUpDown class="ml-auto" />
 							</Sidebar.MenuButton>
 						{/snippet}
 					</DropdownMenu.Trigger>
-					<DropdownMenu.Content class="w-56" side="top" align="start">
+					<DropdownMenu.Content class="w-60" side="top" align="start">
 						<DropdownMenu.Label class="font-normal">
 							<p class="truncate font-medium">{user.name}</p>
 							<p class="truncate text-xs text-muted-foreground">{user.email}</p>

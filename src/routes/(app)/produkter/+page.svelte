@@ -12,8 +12,8 @@
 	let { data }: PageProps = $props();
 	const canOrder = $derived(data.modules.includes('cart') && !!data.user.municipalityId);
 	const chip =
-		'inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm whitespace-nowrap transition-colors hover:bg-muted';
-	const activeChip = 'border-primary bg-primary text-primary-foreground hover:bg-primary/90';
+		'inline-flex items-center gap-1.5 rounded-sm bg-card px-3 py-1.5 text-sm whitespace-nowrap transition-colors hover:bg-accent';
+	const activeChip = 'bg-primary text-primary-foreground hover:bg-primary';
 </script>
 
 <svelte:head><title>Produkter · Kommuneportalen</title></svelte:head>

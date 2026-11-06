@@ -20,7 +20,7 @@
 	{/snippet}
 </PageHeader>
 
-<div class="overflow-hidden rounded-xl border bg-card">
+<div class="overflow-hidden rounded-lg bg-card">
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
@@ -46,7 +46,7 @@
 						{#if p.active}<Badge variant="secondary">Synlig</Badge>{:else}<Badge variant="outline"
 								>Skjult</Badge
 							>{/if}
-						{#if p.isNew}<Badge>Nyhet</Badge>{/if}
+						{#if p.isNew}<Badge class="bg-coral text-ink">Nyhet</Badge>{/if}
 					</Table.Cell>
 				</Table.Row>
 			{:else}

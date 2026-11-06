@@ -22,7 +22,7 @@
 	{/snippet}
 </PageHeader>
 
-<div class="overflow-hidden rounded-xl border bg-card">
+<div class="overflow-hidden rounded-lg bg-card">
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
@@ -40,7 +40,7 @@
 							href="/admin/innlegg/{p.id}"
 							class="inline-flex items-center gap-1.5 font-medium hover:underline"
 						>
-							{#if p.pinned}<Pin class="size-3.5 text-primary" />{/if}{p.title}
+							{#if p.pinned}<Pin class="size-3.5 text-coral" />{/if}{p.title}
 						</a>
 					</Table.Cell>
 					<Table.Cell

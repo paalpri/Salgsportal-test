@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { formatDate } from '#lib/format.ts';
-	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -36,11 +35,13 @@
 
 	<header class="space-y-3">
 		<div class="flex items-center gap-2 text-sm text-muted-foreground">
-			{#if post.kind === 'ad'}<Badge variant="outline">Kampanje</Badge>{/if}
+			{#if post.kind === 'ad'}<span
+					class="rounded-sm bg-coral px-1.5 py-0.5 text-xs font-semibold text-ink">Kampanje</span
+				>{/if}
 			{#if post.publishedAt}<time>{formatDate(post.publishedAt)}</time>{/if}
 			{#if data.authorName}<span>· {data.authorName}</span>{/if}
 		</div>
-		<h1 class="text-3xl font-semibold tracking-tight">{post.title}</h1>
+		<h1 class="text-3xl font-normal md:text-4xl">{post.title}</h1>
 		{#if post.excerpt}<p class="text-lg text-muted-foreground">{post.excerpt}</p>{/if}
 	</header>
 

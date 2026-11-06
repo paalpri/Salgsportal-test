@@ -63,12 +63,12 @@
 			{#if thread.locked}<Badge variant="outline" class="gap-1"><Lock class="size-3" /> Låst</Badge
 				>{/if}
 			{#if accepted}
-				<Badge variant="secondary" class="gap-1 text-emerald-700 dark:text-emerald-400">
+				<Badge class="gap-1 bg-success/10 text-success">
 					<CircleCheck class="size-3" /> Løst
 				</Badge>
 			{/if}
 		</div>
-		<h1 class="text-2xl font-semibold tracking-tight">{thread.title}</h1>
+		<h1 class="text-3xl font-normal md:text-4xl">{thread.title}</h1>
 	</header>
 
 	<ForumPost
@@ -111,8 +111,7 @@
 			>
 				{#snippet badge()}
 					{#if isAccepted}
-						<Badge class="gap-1 bg-emerald-600 text-white"
-							><CircleCheck class="size-3" /> Løsning</Badge
+						<Badge class="gap-1 bg-success text-white"><CircleCheck class="size-3" /> Løsning</Badge
 						>
 					{/if}
 				{/snippet}
@@ -147,7 +146,7 @@
 		<form
 			method="post"
 			action="?/reply"
-			class="space-y-3 rounded-xl border bg-card p-4"
+			class="space-y-3 rounded-lg bg-card p-5 md:p-6"
 			use:enhance={withToast('Svaret er publisert')}
 		>
 			<label for="reply" class="text-sm font-medium">Skriv et svar</label>

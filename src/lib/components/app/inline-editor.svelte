@@ -58,7 +58,7 @@
 		</Card.Content>
 	</Card.Root>
 
-	<div class="divide-y rounded-xl border bg-card">
+	<div class="divide-y rounded-lg bg-card">
 		<div class="hidden gap-2 px-4 py-2 text-xs font-medium text-muted-foreground sm:flex">
 			<div class={grid}>
 				{#each fields as f (f.name)}<span>{f.label}</span>{/each}

@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { formatDate } from '#lib/format.ts';
-	import { Badge } from '#lib/components/ui/badge/index.js';
-	import * as Card from '#lib/components/ui/card/index.js';
 	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 
@@ -19,26 +17,28 @@
 	const Icon = $derived(post.kind === 'ad' ? Megaphone : Newspaper);
 </script>
 
-<a href="/nyheter/{post.slug}" class="group block h-full">
-	<Card.Root class="h-full overflow-hidden pt-0 transition-shadow group-hover:shadow-md">
+<a
+	href="/nyheter/{post.slug}"
+	class="card-link group flex h-full flex-col overflow-hidden rounded-lg bg-card"
+>
+	{#if post.imageUrl}
 		<div class="aspect-[16/9] overflow-hidden bg-muted">
-			{#if post.imageUrl}
-				<img src={post.imageUrl} alt="" class="size-full object-cover" />
-			{:else}
-				<div
-					class="flex size-full items-center justify-center bg-gradient-to-br from-primary/10 to-transparent"
-				>
-					<Icon class="size-10 text-primary/50" />
-				</div>
-			{/if}
+			<img src={post.imageUrl} alt="" class="size-full object-cover" />
 		</div>
-		<Card.Header>
-			<div class="flex items-center gap-2 text-xs text-muted-foreground">
-				{#if post.kind === 'ad'}<Badge variant="outline">Kampanje</Badge>{/if}
-				{#if post.publishedAt}<span>{formatDate(post.publishedAt)}</span>{/if}
-			</div>
-			<Card.Title class="group-hover:underline">{post.title}</Card.Title>
-			<Card.Description class="line-clamp-3">{post.excerpt}</Card.Description>
-		</Card.Header>
-	</Card.Root>
+	{/if}
+	<div class="flex flex-1 flex-col gap-2 p-6">
+		{#if !post.imageUrl}<Icon class="mb-2 size-8" strokeWidth={1.5} />{/if}
+		<p class="flex items-center gap-2 text-xs text-muted-foreground">
+			{#if post.kind === 'ad'}<span class="rounded-sm bg-coral px-1.5 py-0.5 font-semibold text-ink"
+					>Kampanje</span
+				>{/if}
+			{#if post.publishedAt}<time>{formatDate(post.publishedAt)}</time>{/if}
+		</p>
+		<h3
+			class="text-lg leading-snug font-medium group-hover:underline group-hover:underline-offset-4"
+		>
+			{post.title}
+		</h3>
+		<p class="line-clamp-3 text-sm text-muted-foreground">{post.excerpt}</p>
+	</div>
 </a>

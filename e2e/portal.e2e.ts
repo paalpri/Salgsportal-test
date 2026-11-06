@@ -31,7 +31,8 @@ test('registration enforces the kommune email domain', async ({ page }) => {
 	await page.getByLabel('Passord').fill('Passord123!');
 	await page.getByRole('button', { name: 'Opprett konto' }).click();
 	await expect(page).toHaveURL('/');
-	await expect(page.getByText('Velkommen tilbake til portalen for Bodø.')).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Velkommen til Kommuneportalen' })).toBeVisible();
+	await expect(page.getByText('Hei, Test')).toBeVisible();
 });
 
 test('members can start a thread, get a reply and mark it as the solution', async ({
@@ -99,7 +100,7 @@ test('shopping list flows from member request to admin answer', async ({ page, b
 	await page.reload();
 	const request = page.locator('li', { hasText: message });
 	await expect(request.getByText('Besvart')).toBeVisible();
-	await expect(request.getByText('Svar: Tilbud er sendt på e-post.')).toBeVisible();
+	await expect(request.getByText('Tilbud er sendt på e-post.')).toBeVisible();
 });
 
 test('admin publishes a campaign that members see on the dashboard', async ({ page, browser }) => {
@@ -136,7 +137,7 @@ test('admin can switch a module off for members', async ({ page, browser }) => {
 	const member = await browser.newPage();
 	try {
 		await login(member, MEMBER);
-		await expect(member.getByRole('link', { name: 'Forum' })).toHaveCount(0);
+		await expect(member.getByRole('link', { name: 'Forum', exact: true })).toHaveCount(0);
 		const response = await member.goto('/forum');
 		expect(response?.status()).toBe(404);
 	} finally {
@@ -159,4 +160,37 @@ test('sign-up is only possible through the registration form', async ({ request,
 		data: { email: 'bypass@example.com', password: 'Passord123!', name: 'Bypass' }
 	});
 	expect(response.status()).toBe(404);
+});
+
+test('test users on the login page fill in the form', async ({ page }) => {
+	await open(page, '/logg-inn');
+	await page
+		.getByRole('link', { name: /Administrator/ })
+		.first()
+		.click();
+	await expect(page.getByLabel('E-post')).toHaveValue(ADMIN);
+	await expect(page.getByRole('button', { name: 'Logg inn' })).toBeFocused();
+	await page.keyboard.press('Enter');
+	await expect(page).toHaveURL('/');
+	await expect(page.getByText('Administrasjon')).toBeVisible();
+});
+
+test('admin edits the welcome section that every member sees', async ({ page, browser }) => {
+	const title = unique('Velkommen, kommuner');
+	await login(page, ADMIN);
+	await open(page, '/admin/forside');
+	await page.getByLabel('Overskrift').fill(title);
+	await expect(page.getByRole('heading', { name: title })).toBeVisible();
+	await page.getByRole('button', { name: 'Lagre forsiden' }).click();
+	await expect(page.getByText('Forsiden er oppdatert')).toBeVisible();
+
+	const member = await browser.newPage();
+	await login(member, MEMBER);
+	await expect(member.getByRole('heading', { name: title })).toBeVisible();
+	await expect(member.getByRole('link', { name: 'Rediger forsiden' })).toHaveCount(0);
+	expect((await member.goto('/admin/forside'))?.status()).toBe(404);
+	await member.close();
+
+	await page.getByRole('button', { name: 'Gjenopprett standardtekst' }).click();
+	await expect(page.getByLabel('Overskrift')).toHaveValue('Velkommen til Kommuneportalen');
 });
