@@ -10,6 +10,7 @@
 			summary: string;
 			priceNok: number | null;
 			priceUnit: string | null;
+			priceFrom: boolean;
 			imageUrl: string | null;
 			orderUrl: string | null;
 			isNew: boolean;
@@ -49,7 +50,9 @@
 			>
 		</h3>
 		<p class="line-clamp-2 text-sm text-muted-foreground">{product.summary}</p>
-		<p class="text-sm font-semibold">{formatPrice(product.priceNok, product.priceUnit)}</p>
+		<p class="text-sm font-semibold">
+			{formatPrice(product.priceNok, product.priceUnit, product.priceFrom)}
+		</p>
 		<div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
 			<OrderLink url={product.orderUrl} />
 			<a

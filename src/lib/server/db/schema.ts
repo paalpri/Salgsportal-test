@@ -9,6 +9,7 @@ import {
 	text,
 	timestamp
 } from 'drizzle-orm/pg-core';
+import type { PriceGroup } from '../../prices.ts';
 import { user } from './auth.schema.ts';
 
 export * from './auth.schema.ts';
@@ -115,6 +116,9 @@ export const product = pgTable('product', {
 	description: text().notNull().default(''),
 	priceNok: integer(),
 	priceUnit: text(),
+	/** Shows the headline price as «Fra …» when the price list has several levels. */
+	priceFrom: boolean().notNull().default(false),
+	prices: jsonb().$type<PriceGroup[]>().notNull().default([]),
 	imageUrl: text(),
 	/** Where the kommune actually buys or orders the product; the portal only links to it. */
 	orderUrl: text(),

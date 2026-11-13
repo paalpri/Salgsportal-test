@@ -150,18 +150,33 @@ test('front page shows the current driftsmelding and key figures', async ({ page
 	await expect(page.getByRole('heading', { name: 'Nytt i Modulus Barn' })).toBeVisible();
 });
 
-test('products link to where they are ordered, or ask the kommune to get in touch', async ({
-	page
-}) => {
+test('services show their price list and lead to the ordering guide', async ({ page }) => {
 	await login(page, MEMBER);
-	await open(page, '/produkter/digitale-innbyggertjenester');
-	const order = page.getByRole('link', { name: 'Til bestilling' });
-	await expect(order).toHaveAttribute('href', /^https:\/\//);
-	await expect(order).toHaveAttribute('target', '_blank');
+	await open(page, '/produkter/e-laering');
+	await expect(page.getByRole('heading', { name: 'Priser' })).toBeVisible();
+	await expect(page.getByText('201–500 ansatte')).toBeVisible();
+	await expect(page.getByText('60 000 kr/år')).toBeVisible();
+	await page.getByRole('link', { name: 'Til bestilling' }).click();
+	await expect(page).toHaveURL('/produkter#bestilling');
+	await expect(page.getByRole('heading', { name: 'Slik bestiller dere' })).toBeVisible();
+});
 
-	await open(page, '/produkter/superbrukerkurs');
-	await expect(page.getByRole('link', { name: 'Til bestilling' })).toHaveCount(0);
-	await expect(page.getByText('Kontakt oss for mer informasjon')).toBeVisible();
+test('admin edits the price list and order link that members see', async ({ page }) => {
+	await login(page, ADMIN);
+	await open(page, '/admin/produkter');
+	await page.getByRole('link', { name: 'Arbeidsmøte', exact: true }).click();
+	await page.waitForLoadState('networkidle');
+	await page.getByLabel('Prisliste').fill('Timebasert\nInntil 5 timer | 9 999 kr');
+	await page.getByLabel('Lenke til bestilling').fill('https://toolkit.example.no/arbeidsmote');
+	await page.getByRole('button', { name: 'Lagre' }).click();
+	await expect(page.getByText('Lagret')).toBeVisible();
+
+	await open(page, '/produkter/arbeidsmote');
+	await expect(page.getByText('Inntil 5 timer')).toBeVisible();
+	await expect(page.getByText('9 999 kr')).toBeVisible();
+	const order = page.getByRole('link', { name: 'Til bestilling' });
+	await expect(order).toHaveAttribute('href', 'https://toolkit.example.no/arbeidsmote');
+	await expect(order).toHaveAttribute('target', '_blank');
 });
 
 test('wishes are private to the author and visible to admins by category', async ({
