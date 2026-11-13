@@ -11,11 +11,11 @@
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>Nyheter · Modulus Barn</title></svelte:head>
+<svelte:head><title>Nyheter og aktuelt · Modulus Barn</title></svelte:head>
 
 <PageHeader
-	title="Nyheter"
-	description="Hva som er endret i Modulus Barn, nyheter fra DigiBarnevern, driftsmeldinger og kampanjer."
+	title="Nyheter og aktuelt"
+	description="Hold deg oppdatert på siste nytt fra Modulus Barn. Her finner du informasjon om nye funksjoner, aktuelle tilbud og andre nyheter."
 />
 
 <Tabs.Root
@@ -42,9 +42,7 @@
 		<Empty.Header>
 			<Empty.Media variant="icon"><Newspaper /></Empty.Media>
 			<Empty.Title>Ingenting her ennå</Empty.Title>
-			<Empty.Description
-				>Nye endringer, nyheter og driftsmeldinger dukker opp her.</Empty.Description
-			>
+			<Empty.Description>Nye funksjoner, tilbud og nyheter dukker opp her.</Empty.Description>
 		</Empty.Header>
 	</Empty.Root>
 {/if}
