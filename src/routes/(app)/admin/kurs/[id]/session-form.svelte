@@ -88,7 +88,7 @@
 				/>
 			</Field.Field>
 		</div>
-		<div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+		<div class="grid gap-3 {session ? 'sm:grid-cols-[1fr_auto]' : ''}">
 			<Field.Field>
 				<Field.Label for="{key}-signupUrl">Påmeldingslenke</Field.Label>
 				<Input
