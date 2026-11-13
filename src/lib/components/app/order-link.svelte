@@ -5,20 +5,17 @@
 
 	type Props = { url: string | null; size?: ButtonSize; class?: string };
 	let { url, size = 'sm', class: className = '' }: Props = $props();
-	const external = $derived(!!url && /^https?:\/\//.test(url));
+	const href = $derived(url ?? '/produkter#bestilling');
+	const external = $derived(/^https?:\/\//.test(href));
 </script>
 
-{#if url}
-	<Button
-		href={url}
-		{size}
-		class={className}
-		target={external ? '_blank' : undefined}
-		rel={external ? 'noopener noreferrer' : undefined}
-	>
-		Til bestilling
-		{#if external}<ExternalLink />{:else}<ArrowRight />{/if}
-	</Button>
-{:else}
-	<span class="text-sm text-muted-foreground">Kontakt oss for mer informasjon</span>
-{/if}
+<Button
+	{href}
+	{size}
+	class={className}
+	target={external ? '_blank' : undefined}
+	rel={external ? 'noopener noreferrer' : undefined}
+>
+	Til bestilling
+	{#if external}<ExternalLink />{:else}<ArrowRight />{/if}
+</Button>

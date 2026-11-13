@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => ({
 			slug: product.slug,
 			priceNok: product.priceNok,
 			priceUnit: product.priceUnit,
-			orderUrl: product.orderUrl,
+			priceFrom: product.priceFrom,
 			isNew: product.isNew,
 			active: product.active,
 			categoryName: productCategory.name

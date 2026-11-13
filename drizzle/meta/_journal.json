@@ -36,6 +36,13 @@
       "when": 1793955337881,
       "tag": "0004_wishlist",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794585362160,
+      "tag": "0005_product_price_list",
+      "breakpoints": true
     }
   ]
 }

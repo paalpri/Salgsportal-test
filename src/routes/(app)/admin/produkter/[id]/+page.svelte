@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { withToast } from '#lib/forms.ts';
+	import { formatPriceList } from '#lib/prices.ts';
 	import PageHeader from '#lib/components/app/page-header.svelte';
 	import ConfirmDelete from '#lib/components/app/confirm-delete.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -117,17 +118,36 @@
 								id="priceUnit"
 								name="priceUnit"
 								value={v('priceUnit')}
-								placeholder="per år, per deltaker …"
+								placeholder="per år, + reise …"
 								maxlength={40}
 							/>
 						</Field.Field>
 					</div>
+					<Field.Field orientation="horizontal">
+						<Switch id="priceFrom" name="priceFrom" checked={product?.priceFrom ?? false} />
+						<Field.Label for="priceFrom">Vis som «Fra»-pris</Field.Label>
+					</Field.Field>
+					<Field.Field data-invalid={!!errors.prices}>
+						<Field.Label for="prices">Prisliste</Field.Label>
+						<Textarea
+							id="prices"
+							name="prices"
+							rows={8}
+							class="font-mono text-sm"
+							value={values.prices ?? formatPriceList(product?.prices ?? [])}
+							placeholder="Drift og vedlikehold&#10;Under 10 000 innbyggere | 18 857 kr/år"
+						/>
+						<Field.Description>
+							Én pris per linje: «Hva | Pris». En linje uten «|» blir overskrift for prisene under.
+						</Field.Description>
+						{#if errors.prices}<Field.Error>{errors.prices}</Field.Error>{/if}
+					</Field.Field>
 					<Field.Field data-invalid={!!errors.orderUrl}>
 						<Field.Label for="orderUrl">Lenke til bestilling</Field.Label>
 						<Input id="orderUrl" name="orderUrl" value={v('orderUrl')} placeholder="https://…" />
 						<Field.Description>
-							Hvor kommunen kjøper eller bestiller produktet. Uten lenke står det «Kontakt oss for
-							mer informasjon».
+							For eksempel en direkte lenke til tjenesten i Toolkit. Uten lenke går «Til bestilling»
+							til «Slik bestiller dere» i katalogen.
 						</Field.Description>
 						{#if errors.orderUrl}<Field.Error>{errors.orderUrl}</Field.Error>{/if}
 					</Field.Field>

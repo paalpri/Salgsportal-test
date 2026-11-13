@@ -103,9 +103,14 @@ per section; `readContent(key, defaults)` merges stored fields over code default
 sections can be added the same way. Members can write forum posts and send wishes; products, prices,
 purchase links, news and campaigns are admin-only.
 
-**Products.** The portal does not sell anything. Each product can have a purchase link (`orderUrl`) to
-wherever the kommune actually orders it; external links open in a new tab. Without a link the product
-says «Kontakt oss for mer informasjon».
+**Products.** The catalogue is Netcompany's service offer for Modulus Barn (rådgivning og opplæring,
+arbeidsmøter, integrasjonsstøtte, migreringsstøtte); the seed holds the services and prices from the
+current price deck. The portal does not sell anything: services are ordered in Toolkit, and
+`/produkter#bestilling` explains how. Each product has a headline price (`priceNok`, `priceUnit`,
+optionally shown as «Fra …») and a price list (`prices`, JSON groups of label/price rows). Admins edit
+the list as text, one «label | price» per line, with a line without «|» starting a new group
+(`src/lib/prices.ts`). Every product has a «Til bestilling» button: it opens the product's
+`orderUrl` if set (external links in a new tab), otherwise the ordering guide.
 
 **Wishlist (`/onsker`).** Separate from the forum. Members send wishes, optionally with a category,
 and only ever see their own. Admins see all wishes in `/admin/onsker`, filter by category and status,

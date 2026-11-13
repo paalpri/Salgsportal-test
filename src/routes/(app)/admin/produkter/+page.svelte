@@ -43,14 +43,13 @@
 						>{p.categoryName ?? '–'}</Table.Cell
 					>
 					<Table.Cell class="hidden sm:table-cell"
-						>{formatPrice(p.priceNok, p.priceUnit)}</Table.Cell
+						>{formatPrice(p.priceNok, p.priceUnit, p.priceFrom)}</Table.Cell
 					>
 					<Table.Cell class="space-x-1">
 						{#if p.active}<Badge variant="secondary">Synlig</Badge>{:else}<Badge variant="outline"
 								>Skjult</Badge
 							>{/if}
 						{#if p.isNew}<Badge class="bg-coral text-ink">Nyhet</Badge>{/if}
-						{#if !p.orderUrl}<Badge variant="outline">Uten bestillingslenke</Badge>{/if}
 					</Table.Cell>
 				</Table.Row>
 			{:else}

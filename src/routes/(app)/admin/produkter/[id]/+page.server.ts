@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, asc, eq, ne } from 'drizzle-orm';
 import { z } from 'zod';
+import { parsePriceList } from '#lib/prices.ts';
 import { uniqueSlug } from '#lib/server/admin.ts';
 import { db } from '#lib/server/db/index.ts';
 import { product, productCategory } from '#lib/server/db/schema.ts';
@@ -41,6 +42,8 @@ const schema = z.object({
 	description: longText(),
 	priceNok: optionalInt,
 	priceUnit: optionalText(40),
+	priceFrom: checkbox,
+	prices: longText(5000).transform(parsePriceList),
 	imageUrl: optionalUrl,
 	orderUrl: optionalUrl,
 	isNew: checkbox,

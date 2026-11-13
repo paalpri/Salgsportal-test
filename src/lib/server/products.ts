@@ -24,6 +24,7 @@ export async function listProducts({
 			summary: product.summary,
 			priceNok: product.priceNok,
 			priceUnit: product.priceUnit,
+			priceFrom: product.priceFrom,
 			imageUrl: product.imageUrl,
 			orderUrl: product.orderUrl,
 			isNew: product.isNew,

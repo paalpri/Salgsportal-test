@@ -43,19 +43,48 @@
 				<p class="text-lg text-muted-foreground">{p.summary}</p>
 			</div>
 			<div class="leading-7 whitespace-pre-line">{p.description}</div>
+			{#if p.prices.length}
+				<section class="space-y-4">
+					<h2 class="text-xl font-normal md:text-2xl">Priser</h2>
+					<div class="divide-y rounded-lg bg-card">
+						{#each p.prices as group, i (i)}
+							<div class="px-5 py-4">
+								{#if group.title}
+									<h3
+										class="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase"
+									>
+										{group.title}
+									</h3>
+								{/if}
+								<dl>
+									{#each group.rows as row, j (j)}
+										<div class="flex items-baseline justify-between gap-4 py-1.5">
+											<dt>{row.label}</dt>
+											<dd class="max-w-[60%] shrink-0 text-right font-semibold">{row.price}</dd>
+										</div>
+									{/each}
+								</dl>
+							</div>
+						{/each}
+					</div>
+				</section>
+			{/if}
 		</div>
 
 		<aside>
 			<Card.Root class="sticky top-20">
 				<Card.Header>
 					<Card.Description>Pris</Card.Description>
-					<Card.Title class="text-2xl">{formatPrice(p.priceNok, p.priceUnit)}</Card.Title>
+					<Card.Title class="text-2xl"
+						>{formatPrice(p.priceNok, p.priceUnit, p.priceFrom)}</Card.Title
+					>
 				</Card.Header>
 				<Card.Content class="space-y-3">
 					<OrderLink url={p.orderUrl} size="lg" class="h-11 w-full" />
 					<p class="text-xs text-muted-foreground">
-						Bestilling skjer utenfor portalen. Har dere spørsmål om modulen, spør gjerne andre
-						kommuner i forumet.
+						Tjenestene bestilles i Toolkit. <a href="/produkter#bestilling" class="underline"
+							>Slik bestiller dere</a
+						>. Har dere spørsmål, spør gjerne andre kommuner i forumet.
 					</p>
 				</Card.Content>
 			</Card.Root>
