@@ -2,7 +2,7 @@ import { asc, count, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { crudActions } from '#lib/server/admin.ts';
 import { db } from '#lib/server/db/index.ts';
-import { municipality, user } from '#lib/server/db/schema.ts';
+import { municipality, wish } from '#lib/server/db/schema.ts';
 import { optionalText, text } from '#lib/server/forms.ts';
 import type { PageServerLoad } from './$types';
 
@@ -13,11 +13,10 @@ export const load: PageServerLoad = async () => ({
 			name: municipality.name,
 			number: municipality.number,
 			county: municipality.county,
-			emailDomain: municipality.emailDomain,
-			users: count(user.id)
+			wishes: count(wish.id)
 		})
 		.from(municipality)
-		.leftJoin(user, eq(user.municipalityId, municipality.id))
+		.leftJoin(wish, eq(wish.municipalityId, municipality.id))
 		.groupBy(municipality.id)
 		.orderBy(asc(municipality.name))
 });
@@ -25,8 +24,7 @@ export const load: PageServerLoad = async () => ({
 const schema = z.object({
 	name: text(100),
 	number: optionalText(4),
-	county: optionalText(100),
-	emailDomain: optionalText(100).transform((v) => v?.replace(/^@/, '').toLowerCase() ?? null)
+	county: optionalText(100)
 });
 
 export const actions = crudActions(municipality, schema);

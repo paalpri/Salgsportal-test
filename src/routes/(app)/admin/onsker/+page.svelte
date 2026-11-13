@@ -27,7 +27,7 @@
 
 <PageHeader
 	title="Ønsker fra kommunene"
-	description="Alle ønsker som er sendt inn. Kommunebrukerne ser bare sine egne. Sett status og svar, så ser innsenderen det på sin ønskeliste."
+	description="Alle ønsker som er sendt inn fra ønskelisten. Bare administratorer ser dem."
 >
 	{#snippet actions()}
 		<Button href="/admin/onsker/kategorier" variant="outline"><Tags /> Kategorier</Button>
@@ -82,7 +82,7 @@
 					<Table.Cell class="whitespace-normal">
 						<a href="/admin/onsker/{w.id}" class="font-medium hover:underline">{w.title}</a>
 						<span class="block text-xs text-muted-foreground">
-							{[w.municipalityName, w.authorName].filter(Boolean).join(' · ') || 'Slettet bruker'}
+							{w.municipalityName ?? 'Kommune ikke oppgitt'}
 						</span>
 					</Table.Cell>
 					<Table.Cell class="hidden text-muted-foreground md:table-cell"

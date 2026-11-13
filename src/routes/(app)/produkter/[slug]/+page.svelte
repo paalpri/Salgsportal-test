@@ -19,7 +19,7 @@
 		<Button href="/produkter" variant="ghost" size="sm" class="-ml-2"
 			><ArrowLeft /> Alle moduler og tjenester</Button
 		>
-		{#if data.user.isAdmin}
+		{#if data.user?.isAdmin}
 			<Button href="/admin/produkter/{p.id}" variant="outline" size="sm"><Pencil /> Rediger</Button>
 		{/if}
 	</div>
@@ -84,7 +84,7 @@
 					<p class="text-xs text-muted-foreground">
 						Tjenestene bestilles i Toolkit. <a href="/produkter#bestilling" class="underline"
 							>Slik bestiller dere</a
-						>. Har dere spørsmål, spør gjerne andre kommuner i forumet.
+						>.
 					</p>
 				</Card.Content>
 			</Card.Root>

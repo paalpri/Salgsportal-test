@@ -10,7 +10,7 @@
 
 <PageHeader
 	title="Kommuner"
-	description="Kundene i portalen. Med e-postdomene satt må nye brukere registrere seg med en adresse på det domenet."
+	description="Kommunene som bruker Modulus Barn. De kan velges når noen sender et ønske."
 />
 
 <InlineEditor
@@ -19,10 +19,8 @@
 	fields={[
 		{ name: 'name', label: 'Navn', required: true },
 		{ name: 'number', label: 'Kommunenr.', class: 'sm:max-w-28' },
-		{ name: 'county', label: 'Fylke' },
-		{ name: 'emailDomain', label: 'E-postdomene', placeholder: 'kommune.kommune.no' }
+		{ name: 'county', label: 'Fylke' }
 	]}
-	note={(row) => `${row.users} brukere`}
-	deleteDescription={(row) =>
-		`${row.users} brukere mister koblingen til kommunen. Ønskene deres beholdes.`}
+	note={(row) => `${row.wishes} ønsker`}
+	deleteDescription={(row) => `${row.wishes} ønsker mister koblingen til kommunen, men beholdes.`}
 />

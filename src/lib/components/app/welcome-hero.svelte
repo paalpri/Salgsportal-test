@@ -4,8 +4,8 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Pencil from '@lucide/svelte/icons/pencil';
 
-	type Props = { welcome: Welcome; greeting?: string; editHref?: string };
-	let { welcome, greeting, editHref }: Props = $props();
+	type Props = { welcome: Welcome; editHref?: string };
+	let { welcome, editHref }: Props = $props();
 	const figures = $derived((welcome.figures ?? []).filter((f) => f.value.trim()));
 </script>
 
@@ -22,10 +22,8 @@
 	>
 		<div class="max-w-2xl space-y-6">
 			<div class="space-y-4">
-				{#if greeting || welcome.eyebrow}
-					<p class="text-sm text-white/70">
-						{greeting}{greeting && welcome.eyebrow ? ' · ' : ''}{welcome.eyebrow}
-					</p>
+				{#if welcome.eyebrow}
+					<p class="text-sm text-white/70">{welcome.eyebrow}</p>
 				{/if}
 				<h1 class="text-4xl leading-[1.05] font-normal md:text-5xl">{welcome.title}</h1>
 				{#if welcome.body}

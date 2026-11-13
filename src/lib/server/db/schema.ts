@@ -27,55 +27,10 @@ export const municipality = pgTable('municipality', {
 	name: text().notNull().unique(),
 	number: text(),
 	county: text(),
-	emailDomain: text(),
 	createdAt: createdAt()
 });
 
-export const forumCategory = pgTable('forum_category', {
-	id: id(),
-	name: text().notNull(),
-	slug: text().notNull().unique(),
-	description: text().notNull().default(''),
-	sortOrder: integer().notNull().default(0),
-	createdAt: createdAt()
-});
-
-export const forumThread = pgTable(
-	'forum_thread',
-	{
-		id: id(),
-		categoryId: integer()
-			.notNull()
-			.references(() => forumCategory.id, { onDelete: 'cascade' }),
-		authorId: text().references(() => user.id, { onDelete: 'set null' }),
-		title: text().notNull(),
-		body: text().notNull(),
-		pinned: boolean().notNull().default(false),
-		locked: boolean().notNull().default(false),
-		acceptedReplyId: integer(),
-		lastActivityAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-		createdAt: createdAt(),
-		editedAt: timestamp({ withTimezone: true })
-	},
-	(t) => [index().on(t.categoryId, t.lastActivityAt)]
-);
-
-export const forumReply = pgTable(
-	'forum_reply',
-	{
-		id: id(),
-		threadId: integer()
-			.notNull()
-			.references(() => forumThread.id, { onDelete: 'cascade' }),
-		authorId: text().references(() => user.id, { onDelete: 'set null' }),
-		body: text().notNull(),
-		createdAt: createdAt(),
-		editedAt: timestamp({ withTimezone: true })
-	},
-	(t) => [index().on(t.threadId, t.createdAt)]
-);
-
-export const postKind = pgEnum('post_kind', ['news', 'release', 'ops', 'ad']);
+export const postKind = pgEnum('post_kind', ['news', 'release', 'ad']);
 
 export const post = pgTable(
 	'post',
@@ -144,12 +99,11 @@ export const wishStatus = pgEnum('wish_status', [
 	'declined'
 ]);
 
-/** Visible only to its author and to admins. */
+/** Sent anonymously from the wishlist; only admins can see wishes. */
 export const wish = pgTable(
 	'wish',
 	{
 		id: id(),
-		authorId: text().references(() => user.id, { onDelete: 'set null' }),
 		municipalityId: integer().references(() => municipality.id, { onDelete: 'set null' }),
 		categoryId: integer().references(() => wishCategory.id, { onDelete: 'set null' }),
 		title: text().notNull(),
@@ -159,7 +113,7 @@ export const wish = pgTable(
 		createdAt: createdAt(),
 		updatedAt: updatedAt()
 	},
-	(t) => [index().on(t.authorId, t.createdAt), index().on(t.status, t.createdAt)]
+	(t) => [index().on(t.status, t.createdAt)]
 );
 
 /** Admin-edited page content, one JSON document per section (see #lib/site-content.ts). */
@@ -168,20 +122,6 @@ export const siteContent = pgTable('site_content', {
 	data: jsonb().notNull(),
 	updatedAt: updatedAt()
 });
-
-export const forumThreadRelations = relations(forumThread, ({ one, many }) => ({
-	category: one(forumCategory, {
-		fields: [forumThread.categoryId],
-		references: [forumCategory.id]
-	}),
-	author: one(user, { fields: [forumThread.authorId], references: [user.id] }),
-	replies: many(forumReply)
-}));
-
-export const forumReplyRelations = relations(forumReply, ({ one }) => ({
-	thread: one(forumThread, { fields: [forumReply.threadId], references: [forumThread.id] }),
-	author: one(user, { fields: [forumReply.authorId], references: [user.id] })
-}));
 
 export const productRelations = relations(product, ({ one }) => ({
 	category: one(productCategory, {

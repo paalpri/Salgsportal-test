@@ -43,6 +43,13 @@
       "when": 1794585362160,
       "tag": "0005_product_price_list",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794586506678,
+      "tag": "0006_public_portal",
+      "breakpoints": true
     }
   ]
 }

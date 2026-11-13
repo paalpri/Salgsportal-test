@@ -1,6 +1,6 @@
 import { and, count, desc, eq, isNull, type SQL } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.ts';
-import { municipality, user, wish, wishCategory } from '#lib/server/db/schema.ts';
+import { municipality, wish, wishCategory } from '#lib/server/db/schema.ts';
 import { listWishCategories } from '#lib/server/wishes.ts';
 import { wishStatusKeys, type WishStatus } from '#lib/wish-status.ts';
 import type { PageServerLoad } from './$types';
@@ -23,12 +23,10 @@ export const load: PageServerLoad = async ({ url }) => {
 				status: wish.status,
 				createdAt: wish.createdAt,
 				categoryName: wishCategory.name,
-				authorName: user.name,
 				municipalityName: municipality.name
 			})
 			.from(wish)
 			.leftJoin(wishCategory, eq(wishCategory.id, wish.categoryId))
-			.leftJoin(user, eq(user.id, wish.authorId))
 			.leftJoin(municipality, eq(municipality.id, wish.municipalityId))
 			.where(and(...filters))
 			.orderBy(desc(wish.createdAt)),

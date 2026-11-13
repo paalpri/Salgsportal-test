@@ -16,7 +16,7 @@
 
 <PageHeader
 	title="Nyheter og kampanjer"
-	description="Endringer i løsningen, nyheter, driftsmeldinger og kampanjer. Velg type for å styre hvor innlegget vises."
+	description="Endringer i løsningen, nyheter og kampanjer. Velg type for å styre hvor innlegget vises."
 >
 	{#snippet actions()}
 		<Button href="/admin/innlegg/ny"><Plus /> Nytt innlegg</Button>

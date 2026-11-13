@@ -5,11 +5,6 @@ export const postKinds = {
 		description: 'Ny versjon eller endret funksjonalitet i Modulus Barn.'
 	},
 	news: { label: 'Nyhet', plural: 'Nyheter', description: 'Generelle nyheter og kunngjøringer.' },
-	ops: {
-		label: 'Driftsmelding',
-		plural: 'Driftsmeldinger',
-		description: 'Vedlikehold, nedetid og feil. Vises som varsel øverst på forsiden i 14 dager.'
-	},
 	ad: {
 		label: 'Kampanje',
 		plural: 'Kampanjer',

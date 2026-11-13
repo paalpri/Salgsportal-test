@@ -2,7 +2,6 @@ import { expect, type Page } from '@playwright/test';
 
 export const PASSWORD = 'Passord123!';
 export const ADMIN = 'admin@kommuneportalen.no';
-export const MEMBER = 'kari.nordmann@bergen.kommune.no';
 
 export async function login(page: Page, email: string, password = PASSWORD) {
 	await open(page, '/logg-inn');

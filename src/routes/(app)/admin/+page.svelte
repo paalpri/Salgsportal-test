@@ -6,7 +6,6 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import Users from '@lucide/svelte/icons/users';
 	import Landmark from '@lucide/svelte/icons/landmark';
-	import MessagesSquare from '@lucide/svelte/icons/messages-square';
 	import Package from '@lucide/svelte/icons/package';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Lightbulb from '@lucide/svelte/icons/lightbulb';
@@ -28,7 +27,6 @@
 			icon: Landmark,
 			href: '/admin/kommuner'
 		},
-		{ label: 'Forumtråder', value: data.stats.threads, icon: MessagesSquare, href: '/forum' },
 		{
 			label: 'Moduler og tjenester',
 			value: data.stats.products,
