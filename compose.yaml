@@ -3,7 +3,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     ports:
-      - 5432:5432
+      - ${PGPORT:-5432}:5432
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
