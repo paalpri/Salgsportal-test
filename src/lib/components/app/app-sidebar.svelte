@@ -35,10 +35,10 @@
 		{ href: '/admin/kommuner', label: 'Kommuner', icon: Landmark }
 	];
 
+	const within = (href: string) =>
+		page.url.pathname === href || page.url.pathname.startsWith(href + '/');
 	const isActive = (href: string) =>
-		href === '/' || href === '/admin'
-			? page.url.pathname === href
-			: page.url.pathname === href || page.url.pathname.startsWith(href + '/');
+		href === '/' || href === '/admin' ? page.url.pathname === href : within(href);
 
 	const item = 'h-9 data-active:shadow-[inset_3px_0_0_var(--coral)]';
 	let logoutForm = $state<HTMLFormElement>();
@@ -87,7 +87,7 @@
 		{/if}
 	</Sidebar.Content>
 
-	{#if user}
+	{#if user && (within('/admin') || within('/profil'))}
 		<Sidebar.Footer class="border-t border-sidebar-border p-3">
 			<form method="post" action="/logg-ut" bind:this={logoutForm} class="hidden"></form>
 			<Sidebar.Menu>
