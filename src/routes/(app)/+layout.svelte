@@ -3,6 +3,7 @@
 	import { Separator } from '#lib/components/ui/separator/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import AppSidebar from '#lib/components/app/app-sidebar.svelte';
+	import { site } from '#lib/site.ts';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Plus from '@lucide/svelte/icons/plus';
 	import type { LayoutProps } from './$types';
@@ -33,7 +34,7 @@
 			{@render children()}
 		</div>
 		<footer class="mx-auto w-full max-w-6xl px-4 pb-8 text-xs text-muted-foreground md:px-10">
-			Kommuneportalen for Modulus Barn · levert og driftet av Netcompany
+			{site.portal} · levert og driftet av Netcompany
 		</footer>
 	</Sidebar.Inset>
 </Sidebar.Provider>

@@ -1,23 +1,38 @@
 <script lang="ts">
 	import { Button } from '#lib/components/ui/button/index.js';
 	import WelcomeHero from '#lib/components/app/welcome-hero.svelte';
-	import SectionHeader from '#lib/components/app/section-header.svelte';
-	import ProductCard from '#lib/components/app/product-card.svelte';
-	import PostCard from '#lib/components/app/post-card.svelte';
+	import KeyFigures from '#lib/components/app/key-figures.svelte';
+	import { modules } from '#lib/modules.ts';
+	import { site } from '#lib/site.ts';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
-	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>Hjem · Modulus Barn</title></svelte:head>
+<svelte:head><title>{site.portal}</title></svelte:head>
 
 <div class="space-y-12 md:space-y-16">
 	<WelcomeHero
 		welcome={data.welcome}
 		editHref={data.user?.isAdmin ? '/admin/forside' : undefined}
 	/>
+
+	<nav aria-label="Hovedområder" class="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-4">
+		{#each modules as m (m.href)}
+			<a href={m.href} class="card-link group flex flex-col gap-2 rounded-lg bg-card p-6">
+				<m.icon class="mb-2 size-8" strokeWidth={1.5} />
+				<h2 class="text-lg leading-snug font-medium">{m.title}</h2>
+				<p class="text-sm text-muted-foreground">{m.description}</p>
+				<span
+					class="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold underline-offset-4 group-hover:underline"
+				>
+					{m.linkLabel}
+					<ArrowRight class="size-4 transition-transform group-hover:translate-x-0.5" />
+				</span>
+			</a>
+		{/each}
+	</nav>
 
 	{#if data.campaign}
 		{@const c = data.campaign}
@@ -43,41 +58,5 @@
 		</section>
 	{/if}
 
-	{#if data.updates.length}
-		<section>
-			<SectionHeader title="Nytt i Modulus Barn" href="/nyheter" linkLabel="Alle nyheter" />
-			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{#each data.updates as post (post.id)}
-					<PostCard {post} />
-				{/each}
-			</div>
-		</section>
-	{/if}
-
-	<section
-		class="flex flex-col gap-5 rounded-lg bg-card p-6 md:flex-row md:items-center md:justify-between md:p-8"
-	>
-		<div class="flex max-w-2xl gap-5">
-			<Lightbulb class="size-8 shrink-0" strokeWidth={1.5} />
-			<div class="space-y-2">
-				<h2 class="text-xl font-normal md:text-2xl">Dere former Modulus Barn</h2>
-				<p class="text-muted-foreground">
-					Kommunene bestemmer i fellesskap hvordan løsningen skal utvikles videre. Har dere et ønske
-					eller en idé? Legg det på ønskelisten, så tar vi det med når kommunene prioriterer.
-				</p>
-			</div>
-		</div>
-		<Button href="/onsker#nytt-onske" size="lg" class="h-11 shrink-0 px-4">Send et ønske</Button>
-	</section>
-
-	{#if data.products.length}
-		<section>
-			<SectionHeader title="Nye moduler og tjenester" href="/produkter" linkLabel="Se alt" />
-			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				{#each data.products as product (product.id)}
-					<ProductCard {product} />
-				{/each}
-			</div>
-		</section>
-	{/if}
+	<KeyFigures figures={data.welcome.figures} />
 </div>
