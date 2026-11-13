@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="nb">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>%sveltekit.status% · Modulus Barn</title>
+		<style>
+			body {
+				margin: 0;
+				min-height: 100vh;
+				display: grid;
+				place-items: center;
+				font-family: system-ui, sans-serif;
+				background: #fafafa;
+				color: #171717;
+			}
+			main {
+				text-align: center;
+				padding: 2rem;
+			}
+			p.status {
+				font-size: 3rem;
+				font-weight: 700;
+				margin: 0;
+				color: #2f5ea8;
+			}
+			a {
+				display: inline-block;
+				margin-top: 1.5rem;
+				padding: 0.5rem 1rem;
+				border-radius: 0.5rem;
+				background: #2f5ea8;
+				color: white;
+				text-decoration: none;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<p class="status">%sveltekit.status%</p>
+			<h1>%sveltekit.error.message%</h1>
+			<a href="/">Til forsiden</a>
+		</main>
+	</body>
+</html>

@@ -1,0 +1,152 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+@import '@fontsource-variable/instrument-sans';
+
+@custom-variant dark (&:is(.dark *));
+@plugin '@tailwindcss/typography';
+
+/* Palette follows netcompany.com: ink, deep green, grey-green canvas and a single coral accent. */
+:root {
+	--ink: #141e1e;
+	--coral: #ff6359;
+	--brand: #123836;
+	--brand-foreground: #ffffff;
+	--background: #e7ecec;
+	--foreground: #141e1e;
+	--card: #ffffff;
+	--card-foreground: #141e1e;
+	--popover: #ffffff;
+	--popover-foreground: #141e1e;
+	--primary: #141e1e;
+	--primary-foreground: #ffffff;
+	--secondary: #e7ecec;
+	--secondary-foreground: #141e1e;
+	--muted: #f2f5f5;
+	--muted-foreground: #4f6563;
+	--accent: #edf1f1;
+	--accent-foreground: #141e1e;
+	--destructive: #c2341f;
+	--success: #1f7a52;
+	--border: #d6dddd;
+	--input: #c3cdcd;
+	--ring: #ff6359;
+	--chart-1: #123836;
+	--chart-2: #41605e;
+	--chart-3: #91a6a4;
+	--chart-4: #ff6359;
+	--chart-5: #d0d7d7;
+	--radius: 0.25rem;
+	--sidebar: #123836;
+	--sidebar-foreground: #dfe8e7;
+	--sidebar-primary: #ff6359;
+	--sidebar-primary-foreground: #141e1e;
+	--sidebar-accent: rgb(255 255 255 / 0.08);
+	--sidebar-accent-foreground: #ffffff;
+	--sidebar-border: rgb(255 255 255 / 0.1);
+	--sidebar-ring: #ff6359;
+}
+
+.dark {
+	--brand: #123836;
+	--brand-foreground: #ffffff;
+	--background: #0e1111;
+	--foreground: #e7ecec;
+	--card: #161f1f;
+	--card-foreground: #e7ecec;
+	--popover: #161f1f;
+	--popover-foreground: #e7ecec;
+	--primary: #e7ecec;
+	--primary-foreground: #141e1e;
+	--secondary: #223030;
+	--secondary-foreground: #e7ecec;
+	--muted: #1c2727;
+	--muted-foreground: #9fb2b0;
+	--accent: #223030;
+	--accent-foreground: #e7ecec;
+	--destructive: #ff7b6b;
+	--success: #4cc38a;
+	--border: rgb(231 236 236 / 0.12);
+	--input: rgb(231 236 236 / 0.2);
+	--ring: #ff6359;
+	--sidebar: #0b2422;
+	--sidebar-foreground: #dfe8e7;
+	--sidebar-primary: #ff6359;
+	--sidebar-primary-foreground: #141e1e;
+	--sidebar-accent: rgb(255 255 255 / 0.07);
+	--sidebar-accent-foreground: #ffffff;
+	--sidebar-border: rgb(255 255 255 / 0.08);
+	--sidebar-ring: #ff6359;
+}
+
+@theme inline {
+	--font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+	--color-ink: var(--ink);
+	--color-coral: var(--coral);
+	--color-brand: var(--brand);
+	--color-brand-foreground: var(--brand-foreground);
+	--color-success: var(--success);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground antialiased;
+	}
+	html {
+		@apply font-sans;
+		font-feature-settings: 'ss01';
+	}
+	h1,
+	h2,
+	h3 {
+		@apply tracking-tight text-balance;
+	}
+}
+
+@layer components {
+	/* Netcompany's interactive cards: flat white, framed in coral on hover and keyboard focus. */
+	.card-link {
+		@apply outline-0 outline-coral transition-[outline-width] duration-150 hover:outline-4 focus-visible:outline-4;
+	}
+}
