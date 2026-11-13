@@ -37,11 +37,12 @@ one pull request.
 6. **Commits** are one line of at most 72 characters: `#<n>: <what the change does>`. Git reads a leading `#` as a
    comment when it reopens a message, so amend and rebase with `--cleanup=verbatim`.
 7. **Pull request.** Push the first commit with `git push -u origin HEAD` and open a draft at once:
-   `gh pr create --draft --base main`, with the body `Closes #<n>` and one short paragraph. When the user says the
-   work is done: `git fetch origin && git rebase origin/main`, get the gate clean, `git push --force-with-lease`,
-   `gh pr ready`.
-8. **Only the owner merges.** Nothing is pushed to `main`, and an agent never merges a pull request.
-9. **Clean up** after the merge: `docker compose down -v` in the worktree, then from the main checkout
+   `gh pr create --draft --base main`, with the body `Closes #<n>` and one short paragraph.
+8. **Merge it yourself** when the work is done: `git fetch origin && git rebase origin/main`, get the gate clean,
+   `git push --force-with-lease`, `gh pr ready`, `gh pr merge --merge`. The owner reviews only `main`, never a pull
+   request, so nobody waits for a review: whatever a merge breaks is fixed or refactored on `main` afterwards.
+   Nothing is pushed straight to `main`.
+9. **Clean up** right after the merge: `docker compose down -v` in the worktree, then from the main checkout
    `git pull --ff-only`, `git worktree remove ../kommuneportal-<n>-<slug>` and `git branch -d <branch>`.
 
 Reach GitHub with `gh`; the GitHub MCP on this machine points at another host. The repository is public: never
