@@ -1,76 +1,40 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN, MEMBER, login, open, pick, unique } from './helpers.ts';
+import { ADMIN, login, open, pick, unique } from './helpers.ts';
 
-test('anonymous visitors are sent to login and back after signing in', async ({ page }) => {
-	await open(page, '/forum');
-	await expect(page).toHaveURL('/logg-inn?redirectTo=%2Fforum');
-	await page.getByLabel('E-post').fill(MEMBER);
+test('visitors browse the portal without logging in', async ({ page }) => {
+	await open(page, '/');
+	await expect(
+		page.getByRole('heading', { name: 'Kommuneportalen for Modulus Barn' })
+	).toBeVisible();
+	await expect(page.getByText('kommuner bruker Modulus Barn')).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Nytt i Modulus Barn' })).toBeVisible();
+	await expect(page.getByText('Driftsmelding')).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Forum' })).toHaveCount(0);
+	await expect(page.getByText('Administrasjon')).toHaveCount(0);
+
+	await page.getByRole('link', { name: 'Nyheter' }).first().click();
+	await expect(page.getByRole('heading', { name: 'Nyheter og aktuelt' })).toBeVisible();
+	await expect(page.getByRole('tab', { name: 'Driftsmeldinger' })).toHaveCount(0);
+});
+
+test('admin pages send visitors to login and back after signing in', async ({ page }) => {
+	await open(page, '/admin');
+	await expect(page).toHaveURL('/logg-inn?redirectTo=%2Fadmin');
+	await page.getByLabel('E-post').fill(ADMIN);
 	await page.getByLabel('Passord').fill('feil-passord');
 	await page.getByRole('button', { name: 'Logg inn' }).click();
 	await expect(page.getByText('Feil e-post eller passord.')).toBeVisible();
 
 	await page.getByLabel('Passord').fill('Passord123!');
 	await page.getByRole('button', { name: 'Logg inn' }).click();
-	await expect(page).toHaveURL('/forum');
-	await expect(page.getByRole('heading', { name: 'Forum', exact: true })).toBeVisible();
+	await expect(page).toHaveURL('/admin');
+	await expect(page.getByRole('heading', { name: 'Administrasjon', exact: true })).toBeVisible();
 });
 
-test('registration enforces the kommune email domain', async ({ page }) => {
-	const email = `${Date.now().toString(36)}@bodo.kommune.no`;
-	await open(page, '/registrer');
-	await page.getByLabel('Navn').fill('Test Testesen');
-	await pick(page, 'Kommune', 'Bodø');
-	await page.getByLabel('E-post').fill('privat@example.com');
-	await page.getByLabel('Passord').fill('Passord123!');
-	await page.getByRole('button', { name: 'Opprett konto' }).click();
-	await expect(
-		page.getByText('Bruk e-postadressen din fra Bodø (@bodo.kommune.no).')
-	).toBeVisible();
-
-	await page.getByLabel('E-post').fill(email);
-	await page.getByLabel('Passord').fill('Passord123!');
-	await page.getByRole('button', { name: 'Opprett konto' }).click();
-	await expect(page).toHaveURL('/');
-	await expect(
-		page.getByRole('heading', { name: 'Kommuneportalen for Modulus Barn' })
-	).toBeVisible();
-	await expect(page.getByText('Hei, Test')).toBeVisible();
-});
-
-test('members can start a thread, get a reply and mark it as the solution', async ({
+test('admin publishes a campaign that visitors see on the front page', async ({
 	page,
 	browser
 }) => {
-	const title = unique('Hvordan eksporterer dere statistikk?');
-	await login(page, MEMBER);
-	await open(page, '/forum');
-	await page.getByRole('link', { name: 'Nytt innlegg' }).first().click();
-	await expect(page).toHaveURL('/forum/ny');
-	await pick(page, 'Kategori', 'Bruk og arbeidsflyt');
-	await page.getByLabel('Tittel').fill(title);
-	await page.getByLabel('Innhold').fill('Vi trenger tall per kvartal.');
-	await page.getByRole('button', { name: 'Publiser' }).click();
-	await expect(page.getByRole('heading', { name: title })).toBeVisible();
-	const threadUrl = page.url();
-
-	const other = await browser.newPage();
-	await login(other, 'ola.hansen@tromso.kommune.no');
-	await open(other, threadUrl);
-	await other.getByLabel('Skriv et svar').fill('Bruk rapportmodulen, eksporter til Excel.');
-	await other.getByRole('button', { name: 'Svar', exact: true }).click();
-	await expect(other.getByText('Bruk rapportmodulen, eksporter til Excel.')).toBeVisible();
-	await expect(other.getByRole('button', { name: 'Marker som løsning' })).toHaveCount(0);
-	await other.close();
-
-	await page.reload();
-	await page.getByRole('button', { name: 'Marker som løsning' }).click();
-	await expect(page.getByText('Løsning', { exact: true })).toBeVisible();
-
-	await open(page, '/forum');
-	await expect(page.getByRole('link', { name: title })).toContainText('Løst');
-});
-
-test('admin publishes a campaign that members see on the dashboard', async ({ page, browser }) => {
 	const title = unique('Vinterkampanje');
 	await login(page, ADMIN);
 	await open(page, '/admin/innlegg/ny');
@@ -83,10 +47,10 @@ test('admin publishes a campaign that members see on the dashboard', async ({ pa
 	await page.getByRole('button', { name: 'Opprett' }).click();
 	await expect(page).toHaveURL(/\/admin\/innlegg\/\d+$/);
 
-	const member = await browser.newPage();
-	await login(member, MEMBER);
-	await expect(member.getByRole('heading', { name: title })).toBeVisible();
-	await member.close();
+	const visitor = await browser.newPage();
+	await open(visitor, '/');
+	await expect(visitor.getByRole('heading', { name: title })).toBeVisible();
+	await visitor.close();
 
 	await page.getByRole('button', { name: 'Slett' }).click();
 	await page.getByRole('alertdialog').getByRole('button', { name: 'Slett' }).click();
@@ -94,14 +58,7 @@ test('admin publishes a campaign that members see on the dashboard', async ({ pa
 	await expect(page.getByText(title)).toHaveCount(0);
 });
 
-test('members cannot reach admin pages', async ({ page }) => {
-	await login(page, MEMBER);
-	const response = await page.goto('/admin');
-	expect(response?.status()).toBe(404);
-	await expect(page.getByRole('link', { name: 'Brukere' })).toHaveCount(0);
-});
-
-test('sign-up is only possible through the registration form', async ({ request, baseURL }) => {
+test('sign-up through the auth API is closed', async ({ request, baseURL }) => {
 	const response = await request.post('/api/auth/sign-up/email', {
 		headers: { Origin: baseURL! },
 		data: { email: 'bypass@example.com', password: 'Passord123!', name: 'Bypass' }
@@ -122,7 +79,7 @@ test('test users on the login page fill in the form', async ({ page }) => {
 	await expect(page.getByText('Administrasjon')).toBeVisible();
 });
 
-test('admin edits the welcome section that every member sees', async ({ page, browser }) => {
+test('admin edits the welcome section that every visitor sees', async ({ page, browser }) => {
 	const title = unique('Velkommen, kommuner');
 	await login(page, ADMIN);
 	await open(page, '/admin/forside');
@@ -131,27 +88,19 @@ test('admin edits the welcome section that every member sees', async ({ page, br
 	await page.getByRole('button', { name: 'Lagre forsiden' }).click();
 	await expect(page.getByText('Forsiden er oppdatert')).toBeVisible();
 
-	const member = await browser.newPage();
-	await login(member, MEMBER);
-	await expect(member.getByRole('heading', { name: title })).toBeVisible();
-	await expect(member.getByRole('link', { name: 'Rediger forsiden' })).toHaveCount(0);
-	expect((await member.goto('/admin/forside'))?.status()).toBe(404);
-	await member.close();
+	const visitor = await browser.newPage();
+	await open(visitor, '/');
+	await expect(visitor.getByRole('heading', { name: title })).toBeVisible();
+	await expect(visitor.getByRole('link', { name: 'Rediger forsiden' })).toHaveCount(0);
+	await open(visitor, '/admin/forside');
+	await expect(visitor).toHaveURL('/logg-inn?redirectTo=%2Fadmin%2Fforside');
+	await visitor.close();
 
 	await page.getByRole('button', { name: 'Gjenopprett standardtekst' }).click();
 	await expect(page.getByLabel('Overskrift')).toHaveValue('Kommuneportalen for Modulus Barn');
 });
 
-test('front page shows the current driftsmelding and key figures', async ({ page }) => {
-	await login(page, MEMBER);
-	await expect(page.getByText('Driftsmelding:')).toBeVisible();
-	await expect(page.getByRole('link', { name: /Planlagt vedlikehold/ })).toBeVisible();
-	await expect(page.getByText('kommuner bruker Modulus Barn')).toBeVisible();
-	await expect(page.getByRole('heading', { name: 'Nytt i Modulus Barn' })).toBeVisible();
-});
-
 test('services show their price list and lead to the ordering guide', async ({ page }) => {
-	await login(page, MEMBER);
 	await open(page, '/produkter/e-laering');
 	await expect(page.getByRole('heading', { name: 'Priser' })).toBeVisible();
 	await expect(page.getByText('201–500 ansatte')).toBeVisible();
@@ -161,7 +110,7 @@ test('services show their price list and lead to the ordering guide', async ({ p
 	await expect(page.getByRole('heading', { name: 'Slik bestiller dere' })).toBeVisible();
 });
 
-test('admin edits the price list and order link that members see', async ({ page }) => {
+test('admin edits the price list and order link that visitors see', async ({ page }) => {
 	await login(page, ADMIN);
 	await open(page, '/admin/produkter');
 	await page.getByRole('link', { name: 'Arbeidsmøte', exact: true }).click();
@@ -179,28 +128,19 @@ test('admin edits the price list and order link that members see', async ({ page
 	await expect(order).toHaveAttribute('target', '_blank');
 });
 
-test('wishes are private to the author and visible to admins by category', async ({
-	page,
-	browser
-}) => {
+test('visitors send wishes that only admins see', async ({ page, browser }) => {
 	const title = unique('Ønske om bedre søk i dokumenter');
-	await login(page, MEMBER);
 	await open(page, '/onsker');
 	await page.getByLabel('Hva ønsker dere?').fill(title);
 	await page
 		.getByLabel('Beskrivelse')
 		.fill('Vi vil kunne søke i innholdet i dokumentene, ikke bare titlene.');
 	await pick(page, 'Kategori', 'Saksbehandling og arbeidsflyt');
+	await pick(page, 'Kommune', 'Tromsø');
 	await page.getByRole('button', { name: 'Send ønsket' }).click();
-	await expect(page.getByRole('heading', { name: title })).toBeVisible();
-	await expect(page.getByText('Mottatt').first()).toBeVisible();
-
-	const other = await browser.newPage();
-	await login(other, 'ola.hansen@tromso.kommune.no');
-	await open(other, '/onsker');
-	await expect(other.getByText(title)).toHaveCount(0);
-	await expect(other.getByText('Samlet oversikt over samværsavtaler')).toHaveCount(0);
-	await other.close();
+	await expect(page.getByText('Takk! Ønsket er sendt')).toBeVisible();
+	await expect(page.getByLabel('Hva ønsker dere?')).toHaveValue('');
+	await expect(page.getByText(title)).toHaveCount(0);
 
 	const admin = await browser.newPage();
 	await login(admin, ADMIN);
@@ -209,17 +149,12 @@ test('wishes are private to the author and visible to admins by category', async
 	await expect(
 		admin.getByRole('link', { name: 'Kopiere tiltaksplan fra forrige periode' })
 	).toHaveCount(0);
+	await expect(admin.getByRole('row', { name: new RegExp(title) })).toContainText('Tromsø');
 	await admin.getByRole('link', { name: title }).click();
 	await admin.waitForLoadState('networkidle');
 	await pick(admin, 'Status', 'Planlagt');
-	await admin.getByLabel('Svar til innsenderen').fill('Dette kommer i neste versjon.');
+	await admin.getByLabel('Notat').fill('Dette kommer i neste versjon.');
 	await admin.getByRole('button', { name: 'Lagre' }).click();
 	await expect(admin.getByText('Lagret')).toBeVisible();
 	await admin.close();
-
-	await page.reload();
-	const card = page.locator('li', { hasText: title });
-	await expect(card.getByText('Planlagt')).toBeVisible();
-	await expect(card.getByText('Dette kommer i neste versjon.')).toBeVisible();
-	await expect(card.getByRole('button', { name: 'Trekk tilbake' })).toHaveCount(0);
 });

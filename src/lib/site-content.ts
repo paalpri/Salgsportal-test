@@ -18,11 +18,11 @@ export const KEY_FIGURE_SLOTS = 4;
 export const defaultWelcome: Welcome = {
 	eyebrow: 'DigiBarnevern · Modulus Barn',
 	title: 'Kommuneportalen for Modulus Barn',
-	body: 'Her samles kommunene som bruker og forvalter Modulus Barn. Følg med på hva som er endret i løsningen, se nye moduler og tjenester, og del erfaringer med andre kommuner. Kommunene bestemmer i fellesskap hvordan Modulus Barn skal utvikles videre, og ønskelisten er stedet å si fra.',
+	body: 'Her samles kommunene som bruker og forvalter Modulus Barn. Følg med på hva som er endret i løsningen og se nye moduler og tjenester. Kommunene bestemmer i fellesskap hvordan Modulus Barn skal utvikles videre, og ønskelisten er stedet å si fra.',
 	primaryLabel: 'Se hva som er nytt',
 	primaryUrl: '/nyheter?type=release',
-	secondaryLabel: 'Spør andre kommuner',
-	secondaryUrl: '/forum/ny',
+	secondaryLabel: 'Se moduler og tjenester',
+	secondaryUrl: '/produkter',
 	imageUrl: '',
 	figures: [
 		{ value: '157', label: 'kommuner bruker Modulus Barn' },

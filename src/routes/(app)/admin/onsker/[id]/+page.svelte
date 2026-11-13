@@ -12,7 +12,6 @@
 	import * as Field from '#lib/components/ui/field/index.js';
 	import * as Select from '#lib/components/ui/select/index.js';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import Mail from '@lucide/svelte/icons/mail';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -41,35 +40,15 @@
 </PageHeader>
 
 <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-	<div class="space-y-6">
-		<Card.Root>
-			<Card.Header><Card.Description>Beskrivelse</Card.Description></Card.Header>
-			<Card.Content class="leading-relaxed whitespace-pre-line">{w.description}</Card.Content>
-		</Card.Root>
-		<Card.Root>
-			<Card.Header><Card.Title class="text-base">Innsender</Card.Title></Card.Header>
-			<Card.Content class="space-y-1 text-sm">
-				{#if data.author?.name}
-					<p class="font-medium">{data.author.name}</p>
-					{#if data.author.jobTitle}<p class="text-muted-foreground">{data.author.jobTitle}</p>{/if}
-					<a
-						href="mailto:{data.author.email}"
-						class="inline-flex items-center gap-1.5 font-medium underline-offset-4 hover:underline"
-					>
-						<Mail class="size-3.5" />
-						{data.author.email}
-					</a>
-				{:else}
-					<p class="text-muted-foreground">Brukeren er slettet.</p>
-				{/if}
-			</Card.Content>
-		</Card.Root>
-	</div>
+	<Card.Root class="h-fit">
+		<Card.Header><Card.Description>Beskrivelse</Card.Description></Card.Header>
+		<Card.Content class="leading-relaxed whitespace-pre-line">{w.description}</Card.Content>
+	</Card.Root>
 
 	<Card.Root class="h-fit">
 		<Card.Header>
 			<Card.Title class="text-base">Behandling</Card.Title>
-			<Card.Description>Status og svar vises for innsenderen.</Card.Description>
+			<Card.Description>Status og notat ser bare administratorer.</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<form method="post" action="?/save" use:enhance={withToast('Lagret', { reset: false })}>
@@ -102,7 +81,7 @@
 						</Select.Root>
 					</Field.Field>
 					<Field.Field>
-						<Field.Label for="adminNote">Svar til innsenderen</Field.Label>
+						<Field.Label for="adminNote">Notat</Field.Label>
 						<Textarea id="adminNote" name="adminNote" class="min-h-28" value={w.adminNote} />
 					</Field.Field>
 					<Button type="submit">Lagre</Button>

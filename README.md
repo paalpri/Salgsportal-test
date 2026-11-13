@@ -1,11 +1,11 @@
 # Kommuneportalen for Modulus Barn
 
-Customer and community portal for the kommuner that use Modulus Barn, the barnevern solution from
-the DigiBarnevern project, delivered by Netcompany. It is not the case-management system itself: it is
-where the people who use and manage Modulus Barn follow what has changed (release notes, news,
-driftsmeldinger), browse new modules, courses and services (each with a link to where it is ordered),
-help each other in a forum, and send wishes for further development, which the kommuner prioritise
-together. Netcompany admins manage all content from `/admin`.
+Public portal for the kommuner that use Modulus Barn, the barnevern solution delivered by Netcompany.
+It is not the case-management system itself, and it sits next to the existing drift site, which covers
+driftsmeldinger. Visitors need no login: they follow what is new (release notes, news, campaigns),
+browse modules, courses and services (each with a link to where it is ordered), and send wishes for
+further development, which the kommuner prioritise together. Only Netcompany admins log in, to manage
+all content from `/admin`.
 
 All text on the site is Norwegian (bokmål), including validation messages (zod `no` locale). Code and docs are in English.
 
@@ -34,18 +34,13 @@ pnpm dev           # http://localhost:5173
 
 Demo users (password `Passord123!`, development only):
 
-| User                              | Role                    |
-| --------------------------------- | ----------------------- |
-| `admin@kommuneportalen.no`        | Admin (Netcompany)      |
-| `kari.nordmann@bergen.kommune.no` | Kommune user, Bergen    |
-| `ola.hansen@tromso.kommune.no`    | Kommune user, Tromsø    |
-| `sara.berg@trondheim.kommune.no`  | Kommune user, Trondheim |
-| `jonas.lie@bodo.kommune.no`       | Kommune user, Bodø      |
+| User                       | Role               |
+| -------------------------- | ------------------ |
+| `admin@kommuneportalen.no` | Admin (Netcompany) |
 
 `pnpm db:reset` wipes the database volume and re-runs migrations and seed.
 
-**Test logins.** While testing, `/logg-inn` shows four test users (admin, barnevernleder,
-saksbehandler, systemansvarlig). Clicking one fills in the form. The panel is always on in `pnpm dev`;
+**Test login.** While testing, `/logg-inn` shows the admin test user. Clicking it fills in the form. The panel is always on in `pnpm dev`;
 a production build only shows it with `DEMO_LOGIN=true`. Never set that in production, and remove
 `src/lib/server/demo-users.ts` and the picker when the portal goes live.
 
@@ -66,42 +61,39 @@ a production build only shows it with `DEMO_LOGIN=true`. Never set that in produ
 
 ```
 src/
-  hooks.server.ts          session lookup, login redirect, /admin and module gating
+  hooks.server.ts          session lookup, login redirect for /admin and /profil
   lib/modules.ts           sections in the main navigation
   lib/server/
     auth.ts                better-auth config
     db/schema.ts           app tables (auth.schema.ts is generated)
     forms.ts               zod helpers + parseForm for form actions
     admin.ts               crudActions() for simple admin lists, slug helpers
-    forum.ts products.ts posts.ts   queries shared between pages
+    products.ts posts.ts wishes.ts   queries shared between pages
   lib/components/ui/       shadcn-svelte components (generated, add more with the CLI)
   lib/components/app/      app components (sidebar, cards, InlineEditor, ConfirmDelete …)
   routes/
-    (auth)/                logg-inn, registrer
-    (app)/                 everything behind login
-      nyheter/ forum/ produkter/ onsker/ profil/
-      admin/               innlegg, produkter, forum, foresporsler, brukere, kommuner, moduler
+    (auth)/                logg-inn (admins only)
+    (app)/                 the portal, public except admin/ and profil/
+      nyheter/ produkter/ onsker/ profil/
+      admin/               forside, innlegg, produkter, onsker, brukere, kommuner
 ```
 
 **Access control** is done once in `hooks.server.ts`, so it also covers form actions (which skip
-layout loads): anonymous users are redirected to `/logg-inn` and `/admin/**` is 404 for non-admins.
-Ownership rules (edit your own forum posts, see and withdraw your own wishes) are checked in each
-action and load.
+layout loads): everything is public except `/admin/**` and `/profil`, which redirect anonymous
+visitors to `/logg-inn`; `/admin/**` is 404 for logged-in non-admins.
 
-**Users and kommuner.** Each user belongs to at most one kommune (`user.municipality_id`). Users
-register themselves at `/registrer`; if the kommune has an email domain set, the address must match
-it. Sign-up through the better-auth HTTP API is disabled so this check can't be skipped. Admins can
-create users, move them between kommuner, change roles and ban them (banning ends their sessions).
+**Users and kommuner.** Accounts are only for Netcompany admins and are created in `/admin/brukere`;
+sign-up through the better-auth HTTP API is closed. Admins can change roles and ban accounts (banning
+ends their sessions). The kommuner in `/admin/kommuner` are offered in the wish form.
 
-**News types.** Posts are an Endring (release notes), Nyhet, Driftsmelding or Kampanje (`src/lib/post-kinds.ts`).
-The newest driftsmelding from the last 14 days is shown as a notice at the top of the front page, and the
-newest kampanje as a banner.
+**News types.** Posts are an Endring (release notes), Nyhet or Kampanje (`src/lib/post-kinds.ts`). The
+newest kampanje is shown as a banner on the front page. Driftsmeldinger belong on the drift site, not here.
 
 **Front page.** The welcome section at the top of `/` is the same for everyone and only admins can
 change it, in `/admin/forside` (with live preview), including the key figures (kommuner, users). It is stored in `site_content` as one JSON document
 per section; `readContent(key, defaults)` merges stored fields over code defaults, so more editable
-sections can be added the same way. Members can write forum posts and send wishes; products, prices,
-purchase links, news and campaigns are admin-only.
+sections can be added the same way. Visitors can send wishes; products, prices, purchase links, news
+and campaigns are admin-only.
 
 **Products.** The catalogue is Netcompany's service offer for Modulus Barn (rådgivning og opplæring,
 arbeidsmøter, integrasjonsstøtte, migreringsstøtte); the seed holds the services and prices from the
@@ -112,10 +104,9 @@ the list as text, one «label | price» per line, with a line without «|» star
 (`src/lib/prices.ts`). Every product has a «Til bestilling» button: it opens the product's
 `orderUrl` if set (external links in a new tab), otherwise the ordering guide.
 
-**Wishlist (`/onsker`).** Separate from the forum. Members send wishes, optionally with a category,
-and only ever see their own. Admins see all wishes in `/admin/onsker`, filter by category and status,
-manage the categories, and set a status and reply that the author sees on their wishlist. Authors can
-withdraw a wish until an admin has started on it.
+**Wishlist (`/onsker`).** A postkasse: anyone can send a wish, optionally with a category and their
+kommune, and nobody sees the wishes afterwards except admins. Admins see all wishes in `/admin/onsker`,
+filter by category and status, manage the categories, and keep a status and an internal note per wish.
 
 ## Extending
 

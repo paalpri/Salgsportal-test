@@ -4,7 +4,8 @@ import { building } from '$app/env';
 import { auth } from '#lib/server/auth.ts';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 
-const publicPaths = ['/logg-inn', '/registrer'];
+const within = (pathname: string, prefix: string) =>
+	pathname === prefix || pathname.startsWith(prefix + '/');
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const session = await auth.api.getSession({ headers: event.request.headers });
@@ -15,14 +16,12 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 const handleAccess: Handle = async ({ event, resolve }) => {
 	const { pathname, search } = event.url;
-	if (publicPaths.includes(pathname)) return resolve(event);
+	const isAdminPath = within(pathname, '/admin');
+	if (!isAdminPath && !within(pathname, '/profil')) return resolve(event);
 
 	const user = event.locals.user;
 	if (!user) redirect(303, `/logg-inn?redirectTo=${encodeURIComponent(pathname + search)}`);
-
-	if ((pathname === '/admin' || pathname.startsWith('/admin/')) && user.role !== 'admin') {
-		error(404, 'Siden finnes ikke');
-	}
+	if (isAdminPath && user.role !== 'admin') error(404, 'Siden finnes ikke');
 	return resolve(event);
 };
 

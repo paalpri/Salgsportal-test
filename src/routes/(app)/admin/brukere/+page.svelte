@@ -95,7 +95,7 @@
 								aria-label="Rediger {u.name}"
 								onclick={() => edit(u)}><Pencil /></Button
 							>
-							{#if u.id !== data.user.id}
+							{#if u.id !== data.user?.id}
 								<form
 									method="post"
 									action={u.banned ? '?/unban' : '?/ban'}
@@ -207,7 +207,7 @@
 						<Field.Field>
 							<Field.Label for="e-role">Rolle</Field.Label>
 							{@render roleSelect('e-role', editRole, (v) => (editRole = v))}
-							{#if editing.id === data.user.id}<Field.Description
+							{#if editing.id === data.user?.id}<Field.Description
 									>Du kan ikke endre din egen rolle.</Field.Description
 								>{/if}
 						</Field.Field>

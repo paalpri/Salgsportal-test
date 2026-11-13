@@ -1,74 +1,49 @@
-import { error, fail } from '@sveltejs/kit';
-import { and, desc, eq } from 'drizzle-orm';
+import { fail } from '@sveltejs/kit';
+import { asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { currentUser } from '#lib/server/auth.ts';
 import { db } from '#lib/server/db/index.ts';
-import { wish, wishCategory } from '#lib/server/db/schema.ts';
+import { municipality, wish, wishCategory } from '#lib/server/db/schema.ts';
 import { optionalInt, parseForm, text } from '#lib/server/forms.ts';
 import { listWishCategories } from '#lib/server/wishes.ts';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const me = currentUser(locals);
-	const [wishes, categories] = await Promise.all([
+export const load: PageServerLoad = async () => {
+	const [categories, municipalities] = await Promise.all([
+		listWishCategories(),
 		db
-			.select({
-				id: wish.id,
-				title: wish.title,
-				description: wish.description,
-				status: wish.status,
-				adminNote: wish.adminNote,
-				createdAt: wish.createdAt,
-				categoryName: wishCategory.name
-			})
-			.from(wish)
-			.leftJoin(wishCategory, eq(wishCategory.id, wish.categoryId))
-			.where(eq(wish.authorId, me.id))
-			.orderBy(desc(wish.createdAt)),
-		listWishCategories()
+			.select({ id: municipality.id, name: municipality.name })
+			.from(municipality)
+			.orderBy(asc(municipality.name))
 	]);
-	return { wishes, categories };
+	return { categories, municipalities };
 };
 
 const schema = z.object({
 	title: text(150),
 	description: text(5000),
-	categoryId: optionalInt
+	categoryId: optionalInt,
+	municipalityId: optionalInt
 });
 
+const exists = async (table: typeof wishCategory | typeof municipality, id: number | null) =>
+	!id || (await db.select({ id: table.id }).from(table).where(eq(table.id, id))).length > 0;
+
 export const actions: Actions = {
-	create: async ({ request, locals }) => {
-		const me = currentUser(locals);
+	create: async ({ request }) => {
 		const { data, failure } = await parseForm(request, schema);
 		if (failure) return failure;
 
 		const categoryId = data.categoryId || null;
-		if (categoryId) {
-			const [found] = await db
-				.select({ id: wishCategory.id })
-				.from(wishCategory)
-				.where(eq(wishCategory.id, categoryId));
-			if (!found) return fail(400, { message: 'Ukjent kategori' });
-		}
+		const municipalityId = data.municipalityId || null;
+		if (!(await exists(wishCategory, categoryId))) return fail(400, { message: 'Ukjent kategori' });
+		if (!(await exists(municipality, municipalityId)))
+			return fail(400, { message: 'Ukjent kommune' });
+
 		await db.insert(wish).values({
 			title: data.title,
 			description: data.description,
 			categoryId,
-			authorId: me.id,
-			municipalityId: me.municipalityId ?? null
+			municipalityId
 		});
-	},
-
-	withdraw: async ({ request, locals }) => {
-		const me = currentUser(locals);
-		const id = Number((await request.formData()).get('id'));
-		const [own] = await db
-			.select({ status: wish.status })
-			.from(wish)
-			.where(and(eq(wish.id, id), eq(wish.authorId, me.id)));
-		if (!own) error(404, 'Ønsket finnes ikke');
-		if (own.status !== 'new')
-			return fail(400, { message: 'Ønsket er allerede under behandling og kan ikke trekkes' });
-		await db.delete(wish).where(eq(wish.id, id));
 	}
 };

@@ -7,7 +7,6 @@
 	const styles: Record<PostKind, string> = {
 		release: 'bg-brand text-white',
 		news: 'bg-secondary text-secondary-foreground',
-		ops: 'bg-primary text-primary-foreground',
 		ad: 'bg-coral text-ink'
 	};
 </script>

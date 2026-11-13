@@ -21,9 +21,8 @@ export const auth = betterAuth({
 	},
 	hooks: {
 		before: createAuthMiddleware(async (ctx) => {
-			// Sign-up only via /registrer, which assigns the kommune and enforces its email domain.
-			// That action calls auth.api directly (no ctx.request); the public HTTP endpoint stays closed.
-			if (ctx.path === '/sign-up/email' && ctx.request) throw new APIError('NOT_FOUND');
+			// Accounts are created by admins in /admin/brukere; the public sign-up endpoint stays closed.
+			if (ctx.path === '/sign-up/email') throw new APIError('NOT_FOUND');
 		})
 	},
 	plugins: [

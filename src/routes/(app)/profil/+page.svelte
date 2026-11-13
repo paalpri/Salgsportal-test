@@ -10,6 +10,8 @@
 
 	let { data, form }: PageProps = $props();
 	const errors = $derived((form && 'errors' in form ? form.errors : {}) as Record<string, string>);
+	// /profil requires login (hooks.server.ts).
+	const user = $derived(data.user!);
 </script>
 
 <svelte:head><title>Min profil · Modulus Barn</title></svelte:head>
@@ -20,7 +22,6 @@
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>Personalia</Card.Title>
-			<Card.Description>Vises ved innleggene dine i forumet.</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<form
@@ -31,21 +32,16 @@
 				<Field.Group>
 					<Field.Field data-invalid={!!errors.name}>
 						<Field.Label for="name">Navn</Field.Label>
-						<Input id="name" name="name" value={data.user.name} required />
+						<Input id="name" name="name" value={user.name} required />
 						{#if errors.name}<Field.Error>{errors.name}</Field.Error>{/if}
 					</Field.Field>
 					<Field.Field>
 						<Field.Label for="jobTitle">Stilling</Field.Label>
-						<Input id="jobTitle" name="jobTitle" value={data.user.jobTitle ?? ''} />
+						<Input id="jobTitle" name="jobTitle" value={user.jobTitle ?? ''} />
 					</Field.Field>
 					<Field.Field>
 						<Field.Label>E-post</Field.Label>
-						<Input value={data.user.email} disabled />
-					</Field.Field>
-					<Field.Field>
-						<Field.Label>Kommune</Field.Label>
-						<Input value={data.user.municipalityName ?? '–'} disabled />
-						<Field.Description>Kontakt en administrator for å endre kommune.</Field.Description>
+						<Input value={user.email} disabled />
 					</Field.Field>
 					<div class="flex justify-end"><Button type="submit">Lagre</Button></div>
 				</Field.Group>

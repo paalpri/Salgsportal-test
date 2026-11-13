@@ -29,7 +29,7 @@
 
 <PageHeader
 	title="Forside"
-	description="Velkomstseksjonen øverst på forsiden. Den er lik for alle kommunebrukere og kan bare endres her."
+	description="Velkomstseksjonen øverst på forsiden. Den er lik for alle besøkende og kan bare endres her."
 >
 	{#snippet actions()}
 		<Button href="/" variant="outline"><ExternalLink /> Se forsiden</Button>
@@ -39,7 +39,7 @@
 <div class="space-y-8">
 	<section class="space-y-3">
 		<h2 class="text-sm font-medium text-muted-foreground">Forhåndsvisning</h2>
-		<WelcomeHero welcome={draft} greeting="Hei, {data.user.name.split(' ')[0]}" />
+		<WelcomeHero welcome={draft} />
 	</section>
 
 	<form
@@ -111,7 +111,7 @@
 								id="secondaryUrl"
 								name="secondaryUrl"
 								bind:value={draft.secondaryUrl}
-								placeholder="/forum"
+								placeholder="/produkter"
 							/>
 							{#if errors.secondaryUrl}<Field.Error>{errors.secondaryUrl}</Field.Error>{/if}
 						</Field.Field>

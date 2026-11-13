@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import Logo from '#lib/components/app/logo.svelte';
 	import DemoUserPicker from '#lib/components/app/demo-user-picker.svelte';
-	import MessagesSquare from '@lucide/svelte/icons/messages-square';
+	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import Package from '@lucide/svelte/icons/package';
 	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import type { LayoutProps } from './$types';
@@ -12,18 +12,18 @@
 	const highlights = [
 		{
 			icon: Newspaper,
-			title: 'Nytt i løsningen',
-			text: 'Endringer, nye versjoner og driftsmeldinger for Modulus Barn.'
+			title: 'Nyheter og aktuelt',
+			text: 'Publiser nye funksjoner, aktuelle tilbud og andre nyheter.'
 		},
 		{
 			icon: Package,
 			title: 'Moduler og tjenester',
-			text: 'Se hva som er nytt, og gå rett til der dere bestiller.'
+			text: 'Hold katalogen, prisene og bestillingslenkene oppdatert.'
 		},
 		{
-			icon: MessagesSquare,
-			title: 'Erfaringer fra andre kommuner',
-			text: 'Spør og svar i forumet, og send ønsker til videreutviklingen.'
+			icon: Lightbulb,
+			title: 'Ønsker fra kommunene',
+			text: 'Følg opp ønskene til videreutviklingen av Modulus Barn.'
 		}
 	];
 	const demo = $derived(
@@ -52,9 +52,9 @@
 			class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.07)_1px,transparent_1px)] bg-[size:25%_33.333%]"
 		></div>
 		<div class="relative max-w-xl space-y-5">
-			<p class="text-sm text-white/70">DigiBarnevern · Modulus Barn</p>
+			<p class="text-sm text-white/70">Modulus Barn · Administrasjon</p>
 			<h2 class="text-4xl leading-[1.1] font-normal xl:text-5xl">
-				Møteplassen for kommunene som bruker Modulus Barn.
+				Innholdet i kommuneportalen for Modulus Barn.
 			</h2>
 		</div>
 		<div class="relative max-w-xl">

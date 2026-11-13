@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { hashPassword } from 'better-auth/crypto';
@@ -14,17 +13,6 @@ const db = drizzle(client, { schema: s, casing: 'snake_case' });
 const DEMO_PASSWORD = 'Passord123!';
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000);
 
-type SeedThread = {
-	category: string;
-	author: string;
-	title: string;
-	body: string;
-	age: number;
-	pinned?: boolean;
-	locked?: boolean;
-	replies: { author: string; body: string; accepted?: boolean }[];
-};
-
 async function main() {
 	const existing = await db.select({ id: s.user.id }).from(s.user).limit(1);
 	if (existing.length) {
@@ -36,19 +24,19 @@ async function main() {
 		.insert(s.municipality)
 		.values(
 			[
-				['Oslo', '0301', 'Oslo', 'oslo.kommune.no'],
-				['Bergen', '4601', 'Vestland', 'bergen.kommune.no'],
-				['Trondheim', '5001', 'Trøndelag', 'trondheim.kommune.no'],
-				['Stavanger', '1103', 'Rogaland', 'stavanger.kommune.no'],
-				['Kristiansand', '4204', 'Agder', 'kristiansand.kommune.no'],
-				['Tromsø', '5501', 'Troms', 'tromso.kommune.no'],
-				['Bodø', '1804', 'Nordland', 'bodo.kommune.no'],
-				['Ålesund', '1508', 'Møre og Romsdal', 'alesund.kommune.no'],
-				['Drammen', '3301', 'Buskerud', 'drammen.kommune.no'],
-				['Lillehammer', '3405', 'Innlandet', 'lillehammer.kommune.no'],
-				['Fredrikstad', '3107', 'Østfold', 'fredrikstad.kommune.no'],
-				['Tønsberg', '3905', 'Vestfold', 'tonsberg.kommune.no']
-			].map(([name, number, county, emailDomain]) => ({ name, number, county, emailDomain }))
+				['Oslo', '0301', 'Oslo'],
+				['Bergen', '4601', 'Vestland'],
+				['Trondheim', '5001', 'Trøndelag'],
+				['Stavanger', '1103', 'Rogaland'],
+				['Kristiansand', '4204', 'Agder'],
+				['Tromsø', '5501', 'Troms'],
+				['Bodø', '1804', 'Nordland'],
+				['Ålesund', '1508', 'Møre og Romsdal'],
+				['Drammen', '3301', 'Buskerud'],
+				['Lillehammer', '3405', 'Innlandet'],
+				['Fredrikstad', '3107', 'Østfold'],
+				['Tønsberg', '3905', 'Vestfold']
+			].map(([name, number, county]) => ({ name, number, county }))
 		)
 		.returning();
 	const k = Object.fromEntries(kommuner.map((m) => [m.name, m.id]));
@@ -62,38 +50,6 @@ async function main() {
 			role: 'admin',
 			municipalityId: null,
 			jobTitle: 'Kundeansvarlig, Netcompany'
-		},
-		{
-			key: 'kari',
-			name: 'Kari Nordmann',
-			email: 'kari.nordmann@bergen.kommune.no',
-			role: 'user',
-			municipalityId: k.Bergen,
-			jobTitle: 'Barnevernleder'
-		},
-		{
-			key: 'ola',
-			name: 'Ola Hansen',
-			email: 'ola.hansen@tromso.kommune.no',
-			role: 'user',
-			municipalityId: k['Tromsø'],
-			jobTitle: 'Saksbehandler'
-		},
-		{
-			key: 'sara',
-			name: 'Sara Berg',
-			email: 'sara.berg@trondheim.kommune.no',
-			role: 'user',
-			municipalityId: k.Trondheim,
-			jobTitle: 'Fagkonsulent'
-		},
-		{
-			key: 'jonas',
-			name: 'Jonas Lie',
-			email: 'jonas.lie@bodo.kommune.no',
-			role: 'user',
-			municipalityId: k['Bodø'],
-			jobTitle: 'Fagsystemansvarlig'
 		}
 	];
 	const users = await db
@@ -122,167 +78,6 @@ async function main() {
 		}))
 	);
 	const u = Object.fromEntries(people.map((p, i) => [p.key, users[i].id]));
-
-	const categories = await db
-		.insert(s.forumCategory)
-		.values([
-			{
-				name: 'Bruk og arbeidsflyt',
-				slug: 'bruk-og-arbeidsflyt',
-				description: 'Spørsmål om daglig bruk av Modulus Barn.',
-				sortOrder: 1
-			},
-			{
-				name: 'BFK og faglige rutiner',
-				slug: 'bfk-og-faglige-rutiner',
-				description: 'Barnevernfaglig kvalitetssystem, maler og god praksis.',
-				sortOrder: 2
-			},
-			{
-				name: 'Integrasjoner',
-				slug: 'integrasjoner',
-				description: 'Bekymringsmeldinger, barnevernsregisteret, folkeregisteret, arkiv og SvarUt.',
-				sortOrder: 3
-			},
-			{
-				name: 'Rapportering og styring',
-				slug: 'rapportering-og-styring',
-				description: 'Statistikk, styringsdata og rapporter til ledelsen.',
-				sortOrder: 4
-			},
-			{
-				name: 'Innføring og oppstart',
-				slug: 'innforing-og-oppstart',
-				description: 'For kommuner som er i gang med å ta i bruk Modulus Barn.',
-				sortOrder: 5
-			},
-			{
-				name: 'Opplæring og superbrukere',
-				slug: 'opplaering-og-superbrukere',
-				description: 'Kurs, opplæringsopplegg og superbrukernettverk.',
-				sortOrder: 6
-			}
-		])
-		.returning();
-	const c = Object.fromEntries(categories.map((cat) => [cat.slug, cat.id]));
-
-	const threads: SeedThread[] = [
-		{
-			category: 'bruk-og-arbeidsflyt',
-			author: 'admin',
-			title: 'Velkommen til forumet – les dette først',
-			body: 'Dette forumet er for dere som bruker og forvalter Modulus Barn i kommunene. Still spørsmål, del rutiner og fortell hva som fungerer – og hva som ikke gjør det.\n\nTre enkle regler:\n• Del aldri personopplysninger eller detaljer fra enkeltsaker. Bruk generelle eller oppdiktede eksempler.\n• Marker svaret som løste problemet, så finner andre det raskere.\n• Feil som haster meldes til brukerstøtte, ikke her.\n\nVi i Netcompany følger med og svarer når vi kan.',
-			age: 30,
-			pinned: true,
-			locked: true,
-			replies: []
-		},
-		{
-			category: 'bruk-og-arbeidsflyt',
-			author: 'ola',
-			title: 'Fristvarsler i undersøkelsesfasen – hvordan har dere satt det opp?',
-			body: 'Vi vil ha varsel to uker før fristen for undersøkelse går ut, men får bare varsel samme dag. Er det noen som har fått til dette i Modulus Barn?',
-			age: 3,
-			replies: [
-				{
-					author: 'kari',
-					body: 'Gå til Innstillinger → Frister → Varsling og legg inn «14 dager før» som ekstra varsel. Det må gjøres per enhet.',
-					accepted: true
-				},
-				{
-					author: 'sara',
-					body: 'Samme hos oss i Trondheim. Husk å lagre for hver enhet, ellers gjelder det bare din egen.'
-				},
-				{ author: 'ola', body: 'Takk begge to, det fungerte!' }
-			]
-		},
-		{
-			category: 'innforing-og-oppstart',
-			author: 'jonas',
-			title: 'Vi starter med Modulus Barn i januar – tips til innføringen?',
-			body: 'Bodø går over til Modulus Barn i januar. Hva skulle dere ønske at dere visste før dere startet? Vi lurer særlig på opplæring, og hvor mye tid vi bør sette av til datamigrering.',
-			age: 2,
-			replies: [
-				{
-					author: 'kari',
-					body: 'Sett av mer tid til opplæring enn dere tror, og bygg et superbrukernettverk tidlig. Vi hadde én superbruker per team, og det hjalp mye de første ukene.'
-				},
-				{
-					author: 'sara',
-					body: 'Migreringen gikk greit hos oss, men rydd i gamle saker før dere starter. Det sparer mye tid i testmigreringen.'
-				}
-			]
-		},
-		{
-			category: 'bfk-og-faglige-rutiner',
-			author: 'kari',
-			title: 'Vår mal for tiltaksplan i BFK – deler gjerne',
-			body: 'Vi har laget en mal for tiltaksplan med tydeligere mål og evalueringspunkter, basert på BFK. Si fra om dere vil ha den, så legger jeg den ut her.',
-			age: 6,
-			replies: [{ author: 'jonas', body: 'Ja takk! Vi går gjennom malene våre før oppstart.' }]
-		},
-		{
-			category: 'integrasjoner',
-			author: 'jonas',
-			title: 'Erfaringer med arkivintegrasjonen (Noark 5)?',
-			body: 'Hvor lang tid tok oppsettet av arkivintegrasjonen hos dere, og trengte dere hjelp fra IT eller arkivleverandøren?',
-			age: 9,
-			replies: [
-				{
-					author: 'sara',
-					body: 'Et par dager. Vi trengte IT til sertifikatet og arkivleverandøren til å åpne tjenesten. Resten gjorde vi selv.'
-				}
-			]
-		},
-		{
-			category: 'rapportering-og-styring',
-			author: 'sara',
-			title: 'Hvilke rapporter bruker dere i ledermøtene?',
-			body: 'Vi skal lage en fast rapportpakke til ledermøtene. Hvilke rapporter eller nøkkeltall fra Modulus Barn bruker dere mest?',
-			age: 11,
-			replies: [
-				{
-					author: 'kari',
-					body: 'Fristoversikten per enhet og antall åpne undersøkelser. Vi tar dem ut hver måned.'
-				}
-			]
-		}
-	];
-
-	for (const t of threads) {
-		const created = daysAgo(t.age);
-		const [thread] = await db
-			.insert(s.forumThread)
-			.values({
-				categoryId: c[t.category],
-				authorId: u[t.author],
-				title: t.title,
-				body: t.body,
-				pinned: t.pinned ?? false,
-				locked: t.locked ?? false,
-				createdAt: created,
-				lastActivityAt: created
-			})
-			.returning();
-		let last = created;
-		for (const [i, r] of t.replies.entries()) {
-			last = new Date(created.getTime() + (i + 1) * 3_600_000 * 5);
-			const [reply] = await db
-				.insert(s.forumReply)
-				.values({ threadId: thread.id, authorId: u[r.author], body: r.body, createdAt: last })
-				.returning();
-			if (r.accepted) {
-				await db
-					.update(s.forumThread)
-					.set({ acceptedReplyId: reply.id })
-					.where(eq(s.forumThread.id, thread.id));
-			}
-		}
-		await db
-			.update(s.forumThread)
-			.set({ lastActivityAt: last })
-			.where(eq(s.forumThread.id, thread.id));
-	}
 
 	const paragraphs = (...parts: string[]) => parts.join('\n\n');
 	const list = (title: string, items: string[]) =>
@@ -872,33 +667,12 @@ async function main() {
 			publishedAt: daysAgo(2)
 		},
 		{
-			kind: 'ops',
-			title: 'Planlagt vedlikehold 14. november kl. 22–24',
-			slug: 'planlagt-vedlikehold-14-november',
-			excerpt: 'Modulus Barn er utilgjengelig i to timer mens vi oppgraderer driftsplattformen.',
-			body: 'Vi oppgraderer driftsplattformen torsdag 14. november kl. 22–24. Modulus Barn er utilgjengelig i dette tidsrommet.\n\nLagre arbeidet ditt før kl. 22. Kommuneportalen er tilgjengelig som vanlig.',
-			published: true,
-			authorId: u.admin,
-			publishedAt: daysAgo(3)
-		},
-		{
-			kind: 'news',
-			title: 'Modulus Barn er nå i bruk i 157 kommuner',
-			slug: 'modulus-barn-157-kommuner',
-			excerpt:
-				'Løsningen fra DigiBarnevern er på vei til å bli nasjonal standard, med over 160 kommuner i løpet av 2026.',
-			body: 'DigiBarnevern ble startet i 2016 av Bufdir, KS og åtte av landets største kommuner. I dag bruker 157 kommuner Modulus Barn, og over 3000 barnevernsansatte jobber i løsningen.\n\nI løpet av 2026 passerer vi 160 kommuner, som til sammen dekker mer enn halvparten av befolkningen. Takk til alle som deler erfaringer og ønsker. Det er dere som former veien videre.',
-			published: true,
-			authorId: u.admin,
-			publishedAt: daysAgo(6)
-		},
-		{
 			kind: 'release',
 			title: 'Nye maler i BFK for undersøkelsesfasen',
 			slug: 'nye-maler-bfk-undersokelse',
 			excerpt:
 				'Oppdaterte maler for undersøkelsesplan og konklusjon, utarbeidet sammen med kommunene.',
-			body: 'Malene for undersøkelsesplan og konklusjon i BFK er oppdatert etter innspill fra kommunene i forumet. De nye malene er tilgjengelige for alle fra i dag.',
+			body: 'Malene for undersøkelsesplan og konklusjon i BFK er oppdatert etter innspill fra kommunene. De nye malene er tilgjengelige for alle fra i dag.',
 			published: true,
 			authorId: u.admin,
 			publishedAt: daysAgo(9)
@@ -965,7 +739,6 @@ async function main() {
 	const wc = Object.fromEntries(wishCategories.map((cat) => [cat.name, cat.id]));
 
 	const wishes: {
-		author: string;
 		kommune: string;
 		category: string | null;
 		title: string;
@@ -975,7 +748,6 @@ async function main() {
 		age: number;
 	}[] = [
 		{
-			author: 'kari',
 			kommune: 'Bergen',
 			category: 'Saksbehandling og arbeidsflyt',
 			title: 'Samlet oversikt over samværsavtaler',
@@ -986,7 +758,6 @@ async function main() {
 			age: 20
 		},
 		{
-			author: 'kari',
 			kommune: 'Bergen',
 			category: 'Rapportering og styringsdata',
 			title: 'Eksport av fristoversikten til Excel',
@@ -995,7 +766,6 @@ async function main() {
 			age: 2
 		},
 		{
-			author: 'ola',
 			kommune: 'Tromsø',
 			category: 'BFK og maler',
 			title: 'Kopiere tiltaksplan fra forrige periode',
@@ -1006,7 +776,6 @@ async function main() {
 			age: 9
 		},
 		{
-			author: 'ola',
 			kommune: 'Tromsø',
 			category: null,
 			title: 'Varsel når en sak overføres til min enhet',
@@ -1015,7 +784,6 @@ async function main() {
 			age: 1
 		},
 		{
-			author: 'sara',
 			kommune: 'Trondheim',
 			category: 'Brukervennlighet',
 			title: 'Mørk modus i saksbehandlingen',
@@ -1025,7 +793,6 @@ async function main() {
 			age: 30
 		},
 		{
-			author: 'jonas',
 			kommune: 'Bodø',
 			category: 'Integrasjoner',
 			title: 'Tydeligere feilmeldinger fra arkivintegrasjonen',
@@ -1037,7 +804,6 @@ async function main() {
 	];
 	for (const w of wishes) {
 		await db.insert(s.wish).values({
-			authorId: u[w.author],
 			municipalityId: k[w.kommune],
 			categoryId: w.category ? wc[w.category] : null,
 			title: w.title,
@@ -1049,11 +815,9 @@ async function main() {
 	}
 
 	console.log(
-		`Seeded ${kommuner.length} kommuner, ${users.length} users, ${threads.length} threads, ${products.length} products, ${wishes.length} wishes.`
+		`Seeded ${kommuner.length} kommuner, ${users.length} users, ${products.length} products, ${wishes.length} wishes.`
 	);
-	console.log(
-		`Demo login: admin@kommuneportalen.no / kari.nordmann@bergen.kommune.no, password "${DEMO_PASSWORD}"`
-	);
+	console.log(`Admin login: admin@kommuneportalen.no, password "${DEMO_PASSWORD}"`);
 }
 
 try {

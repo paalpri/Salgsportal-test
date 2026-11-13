@@ -5,7 +5,6 @@
 	import Newspaper from '@lucide/svelte/icons/newspaper';
 	import Megaphone from '@lucide/svelte/icons/megaphone';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 
 	type Props = {
 		post: {
@@ -18,7 +17,7 @@
 		};
 	};
 	let { post }: Props = $props();
-	const icons = { release: Sparkles, news: Newspaper, ops: TriangleAlert, ad: Megaphone };
+	const icons = { release: Sparkles, news: Newspaper, ad: Megaphone };
 	const Icon = $derived(icons[post.kind]);
 </script>
 
