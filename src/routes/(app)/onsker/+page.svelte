@@ -23,7 +23,7 @@
 
 <PageHeader
 	title="Ønskeliste"
-	description="Fortell oss hva dere ønsker at Modulus Barn skal kunne. Ønskene samles og tas med når kommunene prioriterer videreutviklingen sammen."
+	description="Har dere ideer til hva Modulus Barn kunne gjort enda bedre? Her kan dere dele tanker, forslag og ønsker til fremtidig funksjonalitet. Vi vil gjerne høre fra dere!"
 />
 
 <Card.Root id="nytt-onske" class="max-w-2xl scroll-mt-24">
