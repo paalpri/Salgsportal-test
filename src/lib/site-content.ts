@@ -1,8 +1,10 @@
 export type KeyFigure = { value: string; label: string };
 
-/** The welcome section at the top of the front page. Only admins can change it, in /admin/forside. */
+/**
+ * The welcome section and the key figures on the front page. Only admins can change them, in
+ * /admin/forside.
+ */
 export type Welcome = {
-	eyebrow: string;
 	title: string;
 	body: string;
 	primaryLabel: string;
@@ -16,12 +18,11 @@ export type Welcome = {
 export const KEY_FIGURE_SLOTS = 4;
 
 export const defaultWelcome: Welcome = {
-	eyebrow: 'DigiBarnevern · Modulus Barn',
-	title: 'Kommuneportalen for Modulus Barn',
-	body: 'Her samles kommunene som bruker og forvalter Modulus Barn. Følg med på hva som er endret i løsningen og se nye moduler og tjenester. Kommunene bestemmer i fellesskap hvordan Modulus Barn skal utvikles videre, og ønskelisten er stedet å si fra.',
-	primaryLabel: 'Se hva som er nytt',
-	primaryUrl: '/nyheter?type=release',
-	secondaryLabel: 'Se moduler og tjenester',
+	title: 'Velkommen til Kommuneportalen',
+	body: 'Her har vi samlet nyttig informasjon og tjenester for kommuner som bruker Modulus Barn. Hold deg oppdatert på nyheter, utforsk våre moduler og tjenester, finn aktuelle kurs og del gjerne dine ønsker og ideer til løsningen.',
+	primaryLabel: 'Se siste nytt',
+	primaryUrl: '/nyheter',
+	secondaryLabel: 'Utforsk moduler og tjenester',
 	secondaryUrl: '/produkter',
 	imageUrl: '',
 	figures: [

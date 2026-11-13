@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Logo from '#lib/components/app/logo.svelte';
+	import { site } from '#lib/site.ts';
 	import DemoUserPicker from '#lib/components/app/demo-user-picker.svelte';
 	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import Package from '@lucide/svelte/icons/package';
@@ -40,7 +41,7 @@
 			<div class="w-full max-w-sm">{@render children()}</div>
 		</div>
 		<p class="text-xs text-muted-foreground">
-			Kommuneportalen for Modulus Barn er levert og driftet av Netcompany.
+			{site.portal} er levert og driftet av Netcompany.
 		</p>
 	</div>
 

@@ -4,6 +4,7 @@
 	import { KEY_FIGURE_SLOTS, type Welcome } from '#lib/site-content.ts';
 	import PageHeader from '#lib/components/app/page-header.svelte';
 	import WelcomeHero from '#lib/components/app/welcome-hero.svelte';
+	import KeyFigures from '#lib/components/app/key-figures.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Textarea } from '#lib/components/ui/textarea/index.js';
@@ -29,7 +30,7 @@
 
 <PageHeader
 	title="Forside"
-	description="Velkomstseksjonen øverst på forsiden. Den er lik for alle besøkende og kan bare endres her."
+	description="Velkomstseksjonen og nøkkeltallene på forsiden. De er like for alle besøkende og kan bare endres her."
 >
 	{#snippet actions()}
 		<Button href="/" variant="outline"><ExternalLink /> Se forsiden</Button>
@@ -39,7 +40,10 @@
 <div class="space-y-8">
 	<section class="space-y-3">
 		<h2 class="text-sm font-medium text-muted-foreground">Forhåndsvisning</h2>
-		<WelcomeHero welcome={draft} />
+		<div class="space-y-8">
+			<WelcomeHero welcome={draft} />
+			<KeyFigures figures={draft.figures} />
+		</div>
 	</section>
 
 	<form
@@ -50,16 +54,9 @@
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Innhold</Card.Title>
-				<Card.Description
-					>Hilsenen «Hei, fornavn» legges til automatisk for hver bruker.</Card.Description
-				>
 			</Card.Header>
 			<Card.Content>
 				<Field.Group>
-					<Field.Field data-invalid={!!errors.eyebrow}>
-						<Field.Label for="eyebrow">Overlinje</Field.Label>
-						<Input id="eyebrow" name="eyebrow" bind:value={draft.eyebrow} maxlength={120} />
-					</Field.Field>
 					<Field.Field data-invalid={!!errors.title}>
 						<Field.Label for="title">Overskrift</Field.Label>
 						<Input id="title" name="title" bind:value={draft.title} maxlength={120} required />
@@ -119,8 +116,8 @@
 					<Field.Set>
 						<Field.Legend variant="label">Nøkkeltall</Field.Legend>
 						<Field.Description>
-							Vises nederst i velkomstseksjonen. Tomme rader skjules. Oppdater tallene når flere
-							kommuner tar i bruk løsningen.
+							Vises under kortene på forsiden, i «Modulus Barn i tall». Tomme rader skjules.
+							Oppdater tallene når flere kommuner tar i bruk løsningen.
 						</Field.Description>
 						<div class="grid gap-3">
 							{#each draft.figures as figure, i (i)}

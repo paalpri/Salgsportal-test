@@ -15,7 +15,6 @@ const link = longText(500).refine(
 const slots = Array.from({ length: KEY_FIGURE_SLOTS }, (_, i) => i);
 
 const schema = z.object({
-	eyebrow: longText(120),
 	title: text(120),
 	body: longText(700),
 	primaryLabel: longText(40),
@@ -37,7 +36,6 @@ export const actions: Actions = {
 		if (failure) return failure;
 		const fields = data as Record<string, string>;
 		const welcome: Welcome = {
-			eyebrow: data.eyebrow,
 			title: data.title,
 			body: data.body,
 			primaryLabel: data.primaryLabel,

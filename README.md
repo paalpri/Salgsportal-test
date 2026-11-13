@@ -1,4 +1,4 @@
-# Kommuneportalen for Modulus Barn
+# Modulus Barn – Kommuneportalen
 
 Public portal for the kommuner that use Modulus Barn, the barnevern solution delivered by Netcompany.
 It is not the case-management system itself, and it sits next to the existing drift site, which covers
@@ -62,7 +62,7 @@ a production build only shows it with `DEMO_LOGIN=true`. Never set that in produ
 ```
 src/
   hooks.server.ts          session lookup, login redirect for /admin and /profil
-  lib/modules.ts           sections in the main navigation
+  lib/modules.ts           sections in the main navigation and their front-page cards
   lib/server/
     auth.ts                better-auth config
     db/schema.ts           app tables (auth.schema.ts is generated)
@@ -89,11 +89,12 @@ ends their sessions). The kommuner in `/admin/kommuner` are offered in the wish 
 **News types.** Posts are an Endring (release notes), Nyhet or Kampanje (`src/lib/post-kinds.ts`). The
 newest kampanje is shown as a banner on the front page. Driftsmeldinger belong on the drift site, not here.
 
-**Front page.** The welcome section at the top of `/` is the same for everyone and only admins can
-change it, in `/admin/forside` (with live preview), including the key figures (kommuner, users). It is stored in `site_content` as one JSON document
-per section; `readContent(key, defaults)` merges stored fields over code defaults, so more editable
-sections can be added the same way. Visitors can send wishes; products, prices, purchase links, news
-and campaigns are admin-only.
+**Front page.** `/` is the entry to the portal: a welcome section, a card for each section in
+`src/lib/modules.ts`, and the key figures in «Modulus Barn i tall». The welcome section and the key
+figures are the same for everyone and only admins can change them, in `/admin/forside` (with live
+preview). Both live in one JSON document (`welcome`) in `site_content`; `readContent(key, defaults)`
+merges stored fields over code defaults, so more editable sections can be added the same way.
+Visitors can send wishes; products, prices, purchase links, news and campaigns are admin-only.
 
 **Products.** The catalogue is Netcompany's service offer for Modulus Barn (rådgivning og opplæring,
 arbeidsmøter, integrasjonsstøtte, migreringsstøtte); the seed holds the services and prices from the
@@ -120,12 +121,13 @@ filter by category and status, manage the categories, and keep a status and an i
 
 **A new section** (own menu item):
 
-1. Add an entry to `src/lib/modules.ts` (`label`, `href`, `icon`).
+1. Add an entry to `src/lib/modules.ts` (`label`, `href`, `icon`, and `title`, `description` and
+   `linkLabel` for its front-page card).
 2. Create `src/routes/(app)/<href>/` with its pages.
 3. Add tables to `src/lib/server/db/schema.ts` and run `pnpm db:generate --name <name>` then
    `pnpm db:migrate`.
 
-The sidebar menu is built from the registry.
+The sidebar menu and the front-page cards are built from the registry.
 
 **A new simple admin list** (name plus a few fields, like kommuner or categories): define the table,
 then in the page's `+page.server.ts` export `actions = crudActions(table, zodSchema)` and render

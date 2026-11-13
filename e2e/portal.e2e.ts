@@ -3,16 +3,15 @@ import { ADMIN, login, open, pick, unique } from './helpers.ts';
 
 test('visitors browse the portal without logging in', async ({ page }) => {
 	await open(page, '/');
-	await expect(
-		page.getByRole('heading', { name: 'Kommuneportalen for Modulus Barn' })
-	).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Velkommen til Kommuneportalen' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Modulus Barn i tall' })).toBeVisible();
 	await expect(page.getByText('kommuner bruker Modulus Barn')).toBeVisible();
-	await expect(page.getByRole('heading', { name: 'Nytt i Modulus Barn' })).toBeVisible();
+	await expect(page.getByRole('link', { name: /Del et ønske/ })).toHaveAttribute('href', '/onsker');
 	await expect(page.getByText('Driftsmelding')).toHaveCount(0);
 	await expect(page.getByRole('link', { name: 'Forum' })).toHaveCount(0);
 	await expect(page.getByText('Administrasjon')).toHaveCount(0);
 
-	await page.getByRole('link', { name: 'Nyheter' }).first().click();
+	await page.getByRole('link', { name: /Se nyheter/ }).click();
 	await expect(page.getByRole('heading', { name: 'Nyheter og aktuelt' })).toBeVisible();
 	await expect(page.getByRole('tab', { name: 'Driftsmeldinger' })).toHaveCount(0);
 });
@@ -81,9 +80,11 @@ test('test users on the login page fill in the form', async ({ page }) => {
 
 test('admin edits the welcome section that every visitor sees', async ({ page, browser }) => {
 	const title = unique('Velkommen, kommuner');
+	const figure = unique('158');
 	await login(page, ADMIN);
 	await open(page, '/admin/forside');
 	await page.getByLabel('Overskrift').fill(title);
+	await page.getByLabel('Nøkkeltall 1, tall').fill(figure);
 	await expect(page.getByRole('heading', { name: title })).toBeVisible();
 	await page.getByRole('button', { name: 'Lagre forsiden' }).click();
 	await expect(page.getByText('Forsiden er oppdatert')).toBeVisible();
@@ -91,13 +92,14 @@ test('admin edits the welcome section that every visitor sees', async ({ page, b
 	const visitor = await browser.newPage();
 	await open(visitor, '/');
 	await expect(visitor.getByRole('heading', { name: title })).toBeVisible();
+	await expect(visitor.getByText(figure)).toBeVisible();
 	await expect(visitor.getByRole('link', { name: 'Rediger forsiden' })).toHaveCount(0);
 	await open(visitor, '/admin/forside');
 	await expect(visitor).toHaveURL('/logg-inn?redirectTo=%2Fadmin%2Fforside');
 	await visitor.close();
 
 	await page.getByRole('button', { name: 'Gjenopprett standardtekst' }).click();
-	await expect(page.getByLabel('Overskrift')).toHaveValue('Kommuneportalen for Modulus Barn');
+	await expect(page.getByLabel('Overskrift')).toHaveValue('Velkommen til Kommuneportalen');
 });
 
 test('services show their price list and lead to the ordering guide', async ({ page }) => {
