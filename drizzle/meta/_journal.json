@@ -50,6 +50,13 @@
       "when": 1794586506678,
       "tag": "0006_public_portal",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794587899367,
+      "tag": "0007_course_calendar",
+      "breakpoints": true
     }
   ]
 }

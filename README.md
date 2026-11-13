@@ -74,8 +74,8 @@ src/
   routes/
     (auth)/                logg-inn (admins only)
     (app)/                 the portal, public except admin/ and profil/
-      nyheter/ produkter/ onsker/ profil/
-      admin/               forside, innlegg, produkter, onsker, brukere, kommuner
+      nyheter/ produkter/ kurskalender/ onsker/ profil/
+      admin/               forside, innlegg, produkter, kurs, onsker, brukere, kommuner
 ```
 
 **Access control** is done once in `hooks.server.ts`, so it also covers form actions (which skip
@@ -103,6 +103,14 @@ optionally shown as «Fra …») and a price list (`prices`, JSON groups of labe
 the list as text, one «label | price» per line, with a line without «|» starting a new group
 (`src/lib/prices.ts`). Every product has a «Til bestilling» button: it opens the product's
 `orderUrl` if set (external links in a new tab), otherwise the ordering guide.
+
+**Course calendar (`/kurskalender`).** Short digital courses shown in a month calendar
+(`?maned=YYYY-MM`); clicking one opens its details and a «Meld på kursdeltaker» button. Sign-up
+happens in an external system: each course date (`course_session`) has its own `signupUrl`, an optional
+capacity and a status (open, full, cancelled). A course (`course`) holds the title, description, agenda
+and target group, so the same course can run on many dates. Admins manage both in `/admin/kurs`. Times
+are entered and shown in Norwegian time (`Europe/Oslo`, see `src/lib/courses.ts`) whatever the server's
+time zone.
 
 **Wishlist (`/onsker`).** A postkasse: anyone can send a wish, optionally with a category and their
 kommune, and nobody sees the wishes afterwards except admins. Admins see all wishes in `/admin/onsker`,
