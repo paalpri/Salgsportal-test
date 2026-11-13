@@ -83,8 +83,10 @@ layout loads): everything is public except `/admin/**` and `/profil`, which redi
 visitors to `/logg-inn`; `/admin/**` is 404 for logged-in non-admins.
 
 **Users and kommuner.** Accounts are only for Netcompany admins and are created in `/admin/brukere`;
-sign-up through the better-auth HTTP API is closed. Admins can change roles and ban accounts (banning
-ends their sessions). The kommuner in `/admin/kommuner` are offered in the wish form.
+sign-up through the better-auth HTTP API is closed. The portal has no login link: admins open `/admin`,
+which sends them to `/logg-inn`, and their account menu (profile, theme, logout) only shows in
+`/admin` and `/profil`. Admins can change roles and ban accounts (banning ends their sessions). The
+kommuner in `/admin/kommuner` are offered in the wish form.
 
 **News types.** Posts are an Endring (release notes), Nyhet or Kampanje (`src/lib/post-kinds.ts`). The
 newest kampanje is shown as a banner on the front page. Driftsmeldinger belong on the drift site, not here.

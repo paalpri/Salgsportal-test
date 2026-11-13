@@ -28,6 +28,10 @@ test('admin pages send visitors to login and back after signing in', async ({ pa
 	await page.getByRole('button', { name: 'Logg inn' }).click();
 	await expect(page).toHaveURL('/admin');
 	await expect(page.getByRole('heading', { name: 'Administrasjon', exact: true })).toBeVisible();
+
+	await page.getByRole('button', { name: /Ingrid Solberg/ }).click();
+	await page.getByRole('menuitem', { name: 'Logg ut' }).click();
+	await expect(page).toHaveURL('/logg-inn');
 });
 
 test('admin publishes a campaign that visitors see on the front page', async ({
