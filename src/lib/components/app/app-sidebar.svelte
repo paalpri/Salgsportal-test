@@ -11,6 +11,7 @@
 	import PanelsTopLeft from '@lucide/svelte/icons/panels-top-left';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Package from '@lucide/svelte/icons/package';
+	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Lightbulb from '@lucide/svelte/icons/lightbulb';
 	import Users from '@lucide/svelte/icons/users';
 	import Landmark from '@lucide/svelte/icons/landmark';
@@ -28,6 +29,7 @@
 		{ href: '/admin/forside', label: 'Forside', icon: PanelsTopLeft },
 		{ href: '/admin/innlegg', label: 'Nyheter og kampanjer', icon: FileText },
 		{ href: '/admin/produkter', label: 'Moduler og priser', icon: Package },
+		{ href: '/admin/kurs', label: 'Kurskalender', icon: CalendarDays },
 		{ href: '/admin/onsker', label: 'Ønsker fra kommunene', icon: Lightbulb },
 		{ href: '/admin/brukere', label: 'Brukere', icon: Users },
 		{ href: '/admin/kommuner', label: 'Kommuner', icon: Landmark }

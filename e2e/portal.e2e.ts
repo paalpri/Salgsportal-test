@@ -128,6 +128,43 @@ test('admin edits the price list and order link that visitors see', async ({ pag
 	await expect(order).toHaveAttribute('target', '_blank');
 });
 
+test('admin schedules a course date that visitors open in the calendar', async ({
+	page,
+	browser
+}) => {
+	await login(page, ADMIN);
+	await open(page, '/admin/kurs');
+	await page.getByRole('link', { name: 'Jobb smartere i Modulus Barn' }).click();
+	await page.waitForLoadState('networkidle');
+	const form = page.getByRole('form', { name: 'Ny kursdato' });
+	await form.getByLabel('Dato').fill('2030-03-12');
+	await form.getByLabel('Start').fill('12:30');
+	await form.getByLabel('Slutt').fill('14:30');
+	await form.getByLabel('Maks deltakere').fill('25');
+	await form.getByLabel('Påmeldingslenke').fill('https://pamelding.example.no/smartere');
+	await page.getByRole('button', { name: 'Legg til' }).click();
+	await expect(page.getByText('Kursdatoen er lagt til')).toBeVisible();
+
+	const visitor = await browser.newPage();
+	await open(visitor, '/kurskalender?maned=2030-03');
+	await visitor.getByRole('button', { name: /Jobb smartere i Modulus Barn/ }).click();
+	const dialog = visitor.getByRole('dialog');
+	await expect(dialog.getByRole('heading', { name: 'Jobb smartere i Modulus Barn' })).toBeVisible();
+	await expect(dialog.getByText(/12\. mars 2030, kl\. 12:30–14:30/)).toBeVisible();
+	await expect(dialog.getByText('2 timer')).toBeVisible();
+	await expect(dialog.getByText('Inntil 25 deltakere')).toBeVisible();
+	const signup = dialog.getByRole('link', { name: 'Meld på kursdeltaker' });
+	await expect(signup).toHaveAttribute('href', 'https://pamelding.example.no/smartere');
+	await expect(signup).toHaveAttribute('target', '_blank');
+	await expect(dialog.getByText('Påmeldingen gjennomføres på en ekstern side.')).toBeVisible();
+
+	await visitor.keyboard.press('Escape');
+	await visitor.getByRole('link', { name: 'Forrige måned' }).click();
+	await expect(visitor).toHaveURL('/kurskalender?maned=2030-02');
+	await expect(visitor.getByText(/ingen planlagte kurs i denne perioden/)).toBeVisible();
+	await visitor.close();
+});
+
 test('visitors send wishes that only admins see', async ({ page, browser }) => {
 	const title = unique('Ønske om bedre søk i dokumenter');
 	await open(page, '/onsker');

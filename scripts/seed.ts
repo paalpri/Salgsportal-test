@@ -3,6 +3,9 @@ import postgres from 'postgres';
 import { hashPassword } from 'better-auth/crypto';
 import * as s from '../src/lib/server/db/schema.ts';
 import { parsePriceList } from '../src/lib/prices.ts';
+import { startOfWeek, today } from '@internationalized/date';
+import { osloInstant, TIME_ZONE } from '../src/lib/courses.ts';
+import { slugify } from '../src/lib/slug.ts';
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error('DATABASE_URL is not set');
@@ -627,6 +630,88 @@ async function main() {
 		])
 		.returning();
 
+	const courses = await db
+		.insert(s.course)
+		.values([
+			{
+				title: 'Fra bekymringsmelding til undersøkelse',
+				audience: 'Saksbehandlere og nyansatte i barneverntjenesten',
+				description:
+					'Lær hvordan du registrerer og behandler bekymringsmeldinger, og hvordan du følger opp undersøkelsesprosessen i Modulus Barn. Kurset gir en praktisk gjennomgang av sentrale funksjoner, frister og arbeidsflyter.',
+				agenda: [
+					'Registrering og håndtering av bekymringsmeldinger',
+					'Konklusjon, frister og påminneraktiviteter',
+					'Oppstart og gjennomføring av undersøkelser',
+					'Praktiske eksempler og spørsmål'
+				].join('\n')
+			},
+			{
+				title: 'Tiltak, planer og oppfølging',
+				audience: 'Saksbehandlere som arbeider med tiltak og oppfølging',
+				description:
+					'Få en praktisk gjennomgang av hvordan du oppretter og følger opp planer, tiltak og avtaler i Modulus Barn. Kurset viser hvordan du kan bruke løsningens funksjoner til å holde oversikt over oppgaver og frister.',
+				agenda: [
+					'Opprettelse og oppfølging av tiltaksplaner',
+					'Oversikt over planer og frister',
+					'Oppfølgings- og tilsynsbesøk',
+					'Avtaler og oppfølging av avtaler',
+					'Praktiske eksempler og spørsmål'
+				].join('\n')
+			},
+			{
+				title: 'Aktiviteter, dokumenter og partsinnsyn',
+				audience: 'Saksbehandlere og ansatte med ansvar for dokumentasjon',
+				description:
+					'Lær å arbeide mer effektivt med aktiviteter og dokumenter i Modulus Barn. Kurset gir også en innføring i håndtering av partsinnsyn og hvordan du oppretter saksuttrekk.',
+				agenda: [
+					'Opprettelse og bruk av aktiviteter',
+					'Dokumentmaler, metadata og dokumentlister',
+					'Opprettelse av partsinnsynssak',
+					'Saksuttrekk og vurdering av dokumenter',
+					'Praktiske eksempler og spørsmål'
+				].join('\n')
+			},
+			{
+				title: 'Jobb smartere i Modulus Barn',
+				audience: 'Alle brukere som ønsker bedre oversikt og mer effektiv arbeidsflyt',
+				description:
+					'Oppdag funksjoner som kan gjøre arbeidshverdagen enklere. Kurset viser hvordan du kan tilpasse egne forsider, bruke avanserte søk og få bedre oversikt over barnets nettverk.',
+				agenda: [
+					'Tilpasning av personlige forsider',
+					'Avanserte søk og lagrede listevisninger',
+					'Arbeid med aktører og barnets nettverk',
+					'Bruk av nettverkskartet',
+					'Tips, praktiske eksempler og spørsmål'
+				].join('\n')
+			}
+		])
+		.returning();
+
+	// Tuesdays and Thursdays from next week on, so the calendar always has upcoming courses.
+	const firstTuesday = startOfWeek(today(TIME_ZONE), 'nb-NO').add({ days: 8 });
+	const sessions: [course: number, day: number, start: string, end: string, capacity: number][] = [
+		[0, 0, '09:00', '11:00', 30],
+		[1, 2, '09:00', '11:00', 25],
+		[2, 7, '12:30', '14:30', 30],
+		[3, 9, '09:00', '11:00', 40],
+		[0, 28, '12:30', '14:30', 30],
+		[2, 35, '09:00', '11:00', 30],
+		[3, 23, '12:30', '14:30', 40]
+	];
+	await db.insert(s.courseSession).values(
+		sessions.map(([i, day, start, end, capacity], n) => {
+			const date = firstTuesday.add({ days: day }).toString();
+			return {
+				courseId: courses[i]!.id,
+				startsAt: osloInstant(date, start),
+				endsAt: osloInstant(date, end),
+				signupUrl: `https://example.com/pamelding/${slugify(courses[i]!.title)}-${n + 1}`,
+				capacity,
+				status: n === 1 ? ('full' as const) : ('open' as const)
+			};
+		})
+	);
+
 	await db.insert(s.post).values([
 		{
 			kind: 'ad',
@@ -815,7 +900,7 @@ async function main() {
 	}
 
 	console.log(
-		`Seeded ${kommuner.length} kommuner, ${users.length} users, ${products.length} products, ${wishes.length} wishes.`
+		`Seeded ${kommuner.length} kommuner, ${users.length} users, ${products.length} products, ${courses.length} courses, ${wishes.length} wishes.`
 	);
 	console.log(`Admin login: admin@kommuneportalen.no, password "${DEMO_PASSWORD}"`);
 }

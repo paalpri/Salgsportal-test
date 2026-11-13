@@ -116,6 +116,37 @@ export const wish = pgTable(
 	(t) => [index().on(t.status, t.createdAt)]
 );
 
+export const course = pgTable('course', {
+	id: id(),
+	title: text().notNull(),
+	description: text().notNull().default(''),
+	/** One item per line. */
+	agenda: text().notNull().default(''),
+	audience: text().notNull().default(''),
+	createdAt: createdAt(),
+	updatedAt: updatedAt()
+});
+
+export const courseSessionStatus = pgEnum('course_session_status', ['open', 'full', 'cancelled']);
+
+/** One date a course is held. Sign-up happens in an external system, at `signupUrl`. */
+export const courseSession = pgTable(
+	'course_session',
+	{
+		id: id(),
+		courseId: integer()
+			.notNull()
+			.references(() => course.id, { onDelete: 'cascade' }),
+		startsAt: timestamp({ withTimezone: true }).notNull(),
+		endsAt: timestamp({ withTimezone: true }).notNull(),
+		signupUrl: text().notNull(),
+		capacity: integer(),
+		status: courseSessionStatus().notNull().default('open'),
+		createdAt: createdAt()
+	},
+	(t) => [index().on(t.startsAt)]
+);
+
 /** Admin-edited page content, one JSON document per section (see #lib/site-content.ts). */
 export const siteContent = pgTable('site_content', {
 	key: text().primaryKey(),
